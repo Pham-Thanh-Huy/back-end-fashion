@@ -11,4 +11,6 @@ public class CommentDTO {
     private ProductDTO product;
 
     private UserDTO user;
+
+    private PostDTO post;
 }

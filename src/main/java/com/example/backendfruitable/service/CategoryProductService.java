@@ -21,7 +21,7 @@ public class CategoryProductService {
         List<CategoryProductDTO> categoryProductDTOList = new ArrayList<>();
         try {
             List<CategoryProduct> categoryProductList = categoryProductRepository.findAll();
-            if (categoryProductList == null) {
+            if (categoryProductList == null || categoryProductList.isEmpty()) {
                 baseResponse.setData(null);
                 baseResponse.setMessage(Constant.EMPTY_ALL_CATEGORY_PRODUCT);
                 baseResponse.setCode(Constant.NOT_FOUND_CODE);
@@ -32,6 +32,7 @@ public class CategoryProductService {
                 CategoryProductDTO categoryProductDTO = new CategoryProductDTO();
                 categoryProductDTO.setCategoryId(categoryProduct.getCategoryId());
                 categoryProductDTO.setCategoryName(categoryProduct.getCategoryName());
+                categoryProductDTO.setParentId(categoryProduct.getParentId());
                 categoryProductDTOList.add(categoryProductDTO);
             }
 
@@ -60,6 +61,7 @@ public class CategoryProductService {
             }
             categoryProductDTO.setCategoryId(categoryProduct.getCategoryId());
             categoryProductDTO.setCategoryName(categoryProduct.getCategoryName());
+            categoryProductDTO.setParentId(categoryProduct.getParentId());
 
             baseResponse.setData(categoryProductDTO);
             baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
@@ -76,6 +78,7 @@ public class CategoryProductService {
         try {
             CategoryProduct categoryProduct = new CategoryProduct();
             categoryProduct.setCategoryName(categoryProductDTO.getCategoryName());
+            categoryProduct.setParentId(categoryProductDTO.getParentId());
             categoryProductRepository.save(categoryProduct);
 
             baseResponse.setData(categoryProductDTO);
@@ -99,6 +102,7 @@ public class CategoryProductService {
                 return baseResponse;
             }
             categoryProduct.setCategoryName(categoryProductDTO.getCategoryName());
+            categoryProduct.setParentId(categoryProductDTO.getParentId());
             categoryProductRepository.save(categoryProduct);
 
             baseResponse.setData(categoryProductDTO);

@@ -13,5 +13,8 @@ public class CategoryProductDTO {
     @NotNull(message = "Tên danh mục sản phẩm không được để trống")
     private String categoryName;
 
+    @NotNull(message = "Danh mục cha không được để trống nếu không có danh mục cha hãy điền là 0")
+    private Long parentId;
+
     private List<ProductDTO> productList;
 }

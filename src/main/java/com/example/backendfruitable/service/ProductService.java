@@ -38,16 +38,16 @@ public class ProductService {
 
     public BaseResponse<List<ProductDTO>> getAllProduct() {
         BaseResponse<List<ProductDTO>> baseResponse = new BaseResponse<>();
+        List<ProductDTO> productDTOList = new ArrayList<>();
         try {
             List<Product> productList = productRepository.findAll();
-            List<ProductDTO> productDTOList = new ArrayList<>();
-
-            if (productList == null) {
+            if (productList == null || productList.isEmpty()) {
                 baseResponse.setData(null);
                 baseResponse.setMessage(Constant.EMPTY_ALL_PRODUCT);
                 baseResponse.setCode(Constant.NOT_FOUND_CODE);
                 return baseResponse;
             }
+
             for (Product product : productList) {
                 ProductDTO productDTO = new ProductDTO();
                 productDTO.setProductId(product.getProductId());

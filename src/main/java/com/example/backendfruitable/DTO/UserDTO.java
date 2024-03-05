@@ -39,6 +39,9 @@ public class UserDTO {
     @NotNull(message = "Email không được để trống")
     private String email;
 
+    @NotNull(message = "Ảnh có user không được để trống nếu trống hãy thêm ảnh mặc định")
+    private String userImage;
+
     private String tokenActive;
 
     @NotNull(message = "Tài khoản không được để trống")
@@ -52,4 +55,6 @@ public class UserDTO {
     private List<AuthorizeDTO> authorizeList;
 
     private List<OrderDTO> orderList;
+
+    private List<PostDTO> postList;
 }

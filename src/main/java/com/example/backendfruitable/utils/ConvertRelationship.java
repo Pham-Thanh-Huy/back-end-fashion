@@ -33,6 +33,7 @@ public class ConvertRelationship {
         userDTO.setLastName(user.getLastname());
         userDTO.setAge(user.getAge());
         userDTO.setAddress(user.getAddress());
+       userDTO.setUserImage(user.getUserImage());
         return  userDTO;
     }
 

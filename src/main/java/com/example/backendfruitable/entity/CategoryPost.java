@@ -1,26 +1,25 @@
 package com.example.backendfruitable.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 import java.util.List;
 
 @Entity
-@Data
-@Table(name = "category_product")
-public class CategoryProduct {
+@Table(name = "category_post")
+public class CategoryPost {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_id")
     private Long categoryId;
 
-    @Column(name = "category_name", length = 255)
+    @Column(name = "category_name")
     private String categoryName;
 
     @Column(name = "parent_id")
     private Long parentId;
 
+
     @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}
-    , mappedBy = "categoryProduct")
-    private List<Product> productList;
+    , mappedBy = "categoryPost")
+    private List<Post> postList;
 }

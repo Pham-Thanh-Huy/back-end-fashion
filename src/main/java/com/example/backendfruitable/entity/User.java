@@ -39,7 +39,11 @@ public class User {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "token_active", length = 50)
+    @Column(name = "user_image", columnDefinition = "LONGTEXT")
+    @Lob
+    private String userImage;
+
+    @Column(name = "token_active", length = 255)
     private String token_active;
 
     @Column(name = "is_active")
@@ -62,5 +66,9 @@ public class User {
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.LAZY, mappedBy = "user")
     @JsonIgnore
     private List<Order> orderList;
+
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.LAZY, mappedBy = "user")
+    @JsonIgnore
+    private List<Post> postList;
 
 }
