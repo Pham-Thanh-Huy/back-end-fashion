@@ -28,8 +28,12 @@ public class Constant {
 
     // Constant với user
     public static final String EMPTY_USER_BY_ID = "Không tìm thấy user với id là: ";
-    public static final String ERORR_TO_GET_USER = "Lỗi trong quá trình lấy user: ";
     public static final String EMPTY_ALL_USER = "Không tồn tại người dùng nào";
+    public static final String ERORR_TO_GET_USER = "Lỗi trong quá trình lấy user: ";
+    public static final String ERORR_TO_ADD_USER = "Lỗi trong quá trình thêm user:  ";
+
+    // Constant với Authorize
+    public static final String EMPTY_AUTHORIZE_BY_ID = "Không tìm thấy quyền hạn với id là: ";
 
     // Các constant với các trạng thái code của HTTP STATUS
     public static final int INTERNAL_SERVER_ERROR_CODE = 500;

@@ -3,13 +3,12 @@ package com.example.backendfruitable.controller;
 import com.example.backendfruitable.DTO.BaseResponse;
 import com.example.backendfruitable.DTO.UserDTO;
 import com.example.backendfruitable.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,5 +28,11 @@ public class UserController {
     public ResponseEntity<BaseResponse<UserDTO>> getUserById(@PathVariable("id") Long id){
         BaseResponse<UserDTO> baseResponse = userService.getUserById(id);
         return new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<BaseResponse<UserDTO>> addUser(@Valid @RequestBody UserDTO userDTO){
+        BaseResponse<UserDTO> baseResponse = userService.addUser(userDTO);
+        return  new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
     }
 }

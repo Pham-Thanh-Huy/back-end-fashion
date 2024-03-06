@@ -3,6 +3,7 @@ package com.example.backendfruitable.DTO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 
@@ -25,16 +26,16 @@ public class ProductDTO {
     @NotNull(message = "Lựa chọn sản phẩm nổi bật không được để trống")
     private Boolean outstanding;
 
-    @NotNull(message = "Code của sản phẩm không được để trống")
+    @NotBlank(message = "Code của sản phẩm không được để trống")
     private String productCode;
 
-    @NotNull(message = "Mô tả sản phẩm không được để trống")
+    @NotBlank(message = "Mô tả sản phẩm không được để trống")
     private String productDescription;
 
-    @NotNull(message = "Chi tiết sản phẩm không được để trống")
+    @NotBlank(message = "Chi tiết sản phẩm không được để trống")
     private String productDetail;
 
-    @NotNull(message = "Tên sản phẩm không được để trống")
+    @NotBlank(message = "Tên sản phẩm không được để trống")
     private String productName;
 
     @NotNull(message = "Giá tiền của sản phẩm không được để trống")

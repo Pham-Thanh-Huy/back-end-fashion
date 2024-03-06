@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AuthorizeDTO {
-    private Integer authorizeId;
+    private Long authorizeId;
     private String authorizeName;
 
     private List<UserDTO> userList;
