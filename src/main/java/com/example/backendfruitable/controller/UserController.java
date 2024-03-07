@@ -35,4 +35,16 @@ public class UserController {
         BaseResponse<UserDTO> baseResponse = userService.addUser(userDTO);
         return  new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
     }
+
+    @PutMapping("/update")
+    public ResponseEntity<BaseResponse<UserDTO>> updateUser(@RequestParam("userId") Long userId, @Valid @RequestBody UserDTO userDTO){
+        BaseResponse<UserDTO> baseResponse = userService.updateUser(userId,userDTO);
+        return  new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<BaseResponse<UserDTO>> deleteUserById(@PathVariable("id") Long id){
+        BaseResponse<UserDTO> baseResponse = userService.deleteUserById(id);
+        return  new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
+    }
 }

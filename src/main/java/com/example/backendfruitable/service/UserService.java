@@ -5,16 +5,19 @@ import com.example.backendfruitable.DTO.BaseResponse;
 import com.example.backendfruitable.DTO.UserDTO;
 import com.example.backendfruitable.Repository.AuthorizeRepository;
 import com.example.backendfruitable.Repository.UserRepository;
+import com.example.backendfruitable.email.EmailConfig;
 import com.example.backendfruitable.entity.Authorize;
 import com.example.backendfruitable.entity.User;
 import com.example.backendfruitable.utils.Constant;
 import com.example.backendfruitable.utils.ConvertRelationship;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -31,6 +34,9 @@ public class UserService {
 
     @Autowired
     private AuthorizeRepository authorizeRepository;
+
+    @Autowired
+    private EmailConfig emailConfig;
 
     public BaseResponse<List<UserDTO>> getAllUser() {
         BaseResponse<List<UserDTO>> baseResponse = new BaseResponse<>();
@@ -106,6 +112,20 @@ public class UserService {
     public BaseResponse<UserDTO> addUser(UserDTO userDTO) {
         BaseResponse<UserDTO> baseResponse = new BaseResponse<>();
         try {
+            User checkUserEmailExits = userRepository.getUserByEmail(userDTO.getEmail());
+            User checkUserUsernameExits = userRepository.getUserByUsername(userDTO.getUsername());
+            if(checkUserUsernameExits != null){
+                baseResponse.setMessage(Constant.EXISTS_USER_USERNAME + userDTO.getUsername());
+                baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                return baseResponse;
+            }
+            if(checkUserEmailExits != null){
+                baseResponse.setMessage(Constant.EXISTS_USER_EMAIL + userDTO.getEmail());
+                baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                return baseResponse;
+            }
+
+
             User user = new User();
             user.setUserId(userDTO.getUserId());
             user.setUsername(userDTO.getUsername());
@@ -121,8 +141,6 @@ public class UserService {
             user.setToken_active(randomTokenActive);
             user.setIsActive(false);
 
-            //cấu hình mail
-            String textSendMailActive = "Bạn vừa đăng kí tại khoản ở fashion";
 
             // Lấy 1 list mối quan hệ bên bảng authorize  qua id khi truyền vào từ api mapping của userDTO
             List<AuthorizeDTO> authorizeDTOList = userDTO.getAuthorizeList();
@@ -131,7 +149,7 @@ public class UserService {
                 Authorize authorize = authorizeRepository.getAuthorizeById(authorizeDTO.getAuthorizeId());
                 if (authorize != null) {
                     authorizeList.add(authorize);
-                }else{
+                } else {
                     baseResponse.setMessage(Constant.EMPTY_AUTHORIZE_BY_ID + authorizeDTO.getAuthorizeId());
                     baseResponse.setCode(Constant.NOT_FOUND_CODE);
                     return baseResponse;
@@ -140,6 +158,15 @@ public class UserService {
             user.setAuthorizeList(authorizeList);
 
             userRepository.save(user);
+
+            //cấu hình mail
+            String subject = "Active tài khoản tài Fashion";
+            String textSendMailActive = "Bạn vừa đăng kí tại khoản ở fashion để tài khoản có thể sử dụng bạn cần xác thực" +
+                    "<Br>Mã xác thực của bạn là:  " + randomTokenActive + "" +
+                    "<Br>Bạn có thể xác thực theo đường link sau: " +
+                    "http://localhost:3000/user-active?email=" + user.getEmail() + "&codeActive=" + randomTokenActive + "";
+
+                emailConfig.sendMail("phamthanhhuy3062k3@gmail.com", user.getEmail(), subject, textSendMailActive);
 
             baseResponse.setData(userDTO);
             baseResponse.setMessage(Constant.SUCCESS_ADD_MESSAGE);
@@ -152,6 +179,106 @@ public class UserService {
         }
         return baseResponse;
     }
+
+
+    public BaseResponse<UserDTO> updateUser(Long userId, UserDTO userDTO){
+        BaseResponse<UserDTO> baseResponse = new BaseResponse<>();
+        try{
+            User user= userRepository.getUserById(userId);
+            User checkUserEmailExits = userRepository.getUserByEmail(userDTO.getEmail());
+            User checkUserUsernameExits = userRepository.getUserByUsername(userDTO.getUsername());
+
+           if(user == null){
+               baseResponse.setMessage(Constant.EMPTY_USER_BY_ID + userId);
+               baseResponse.setCode(Constant.NOT_FOUND_CODE);
+               return baseResponse;
+           }else{
+               //nếu email khác với email đã lưu mới check xem nó đã tồn tại trong hệ thống chưa
+               if(!user.getUsername().equals(userDTO.getUsername())){
+                   if(checkUserUsernameExits != null){
+                       baseResponse.setMessage(Constant.EXISTS_USER_USERNAME + userDTO.getUsername());
+                       baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                       return baseResponse;
+                   }
+               }
+               //nếu username khác với username đã lưu mới check xem nó đã tồn tại trong hệ thống chưa
+               if(!user.getEmail().equals(userDTO.getEmail())){
+                    if(checkUserEmailExits != null){
+                        baseResponse.setMessage(Constant.EXISTS_USER_EMAIL + userDTO.getEmail());
+                        baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                        return baseResponse;
+                    }
+               }
+           }
+
+            // cập nhật
+            user.setUsername(userDTO.getUsername());
+            user.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
+            user.setEmail(userDTO.getEmail());
+            user.setFirstName(userDTO.getFirstName());
+            user.setLastname(userDTO.getLastName());
+            user.setAge(userDTO.getAge());
+            user.setAddress(userDTO.getAddress());
+            user.setUserImage(userDTO.getUserImage());
+            user.setSex(userDTO.getSex());
+
+            // làm mới lại authorize
+            user.getAuthorizeList().clear();
+
+            List<AuthorizeDTO> authorizeDTOList = userDTO.getAuthorizeList();
+            List<Authorize> authorizeList = new ArrayList<>();
+            for(AuthorizeDTO authorizeDTO : authorizeDTOList){
+                Authorize authorize = authorizeRepository.getAuthorizeById(authorizeDTO.getAuthorizeId());
+                if (authorize != null) {
+                    authorizeList.add(authorize);
+                } else {
+                    baseResponse.setMessage(Constant.EMPTY_AUTHORIZE_BY_ID + authorizeDTO.getAuthorizeId());
+                    baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                    return baseResponse;
+                }
+            }
+            user.setAuthorizeList(authorizeList);
+
+            userRepository.save(user);
+
+            baseResponse.setData(userDTO);
+            baseResponse.setMessage(Constant.SUCCESS_UPDATE_MESSAGE);
+            baseResponse.setCode(Constant.SUCCESS_CODE);
+        }catch (Exception e){
+            baseResponse.setMessage(Constant.ERORR_TO_UPDATE_USER + e.getMessage());
+            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+        }
+        return baseResponse;
+    }
+
+
+    public BaseResponse<UserDTO> deleteUserById(Long id) {
+        BaseResponse<UserDTO> baseResponse = new BaseResponse<>();
+        try {
+            Optional<User> optionalUser = userRepository.findById(id);
+            if (!optionalUser.isPresent()) {
+                baseResponse.setMessage(Constant.EMPTY_USER_BY_ID + id);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
+            }
+            User user = optionalUser.get();
+
+            // Xoá tất cả các mối quan hệ nhiều-nhiều với Authorize
+            user.getAuthorizeList().clear();
+
+            // Xoá người dùng và lưu thay đổi vào cơ sở dữ liệu
+            userRepository.deleteInBatch(List.of(user));
+
+            baseResponse.setMessage(Constant.DELETE_SUCCESS_USER_BY_ID + id);
+            baseResponse.setCode(Constant.SUCCESS_CODE);
+        } catch (Exception e) {
+            baseResponse.setMessage(Constant.ERORR_TO_DELETE_USER + e.getMessage());
+            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+        }
+        return baseResponse;
+    }
+
+
 
     // random 1 chuoi code Active
     public String codeActive() {
