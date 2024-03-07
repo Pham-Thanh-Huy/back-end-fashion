@@ -1,6 +1,7 @@
 package com.example.backendfruitable.DTO;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank; // Thay thế @NotNull bằng @NotBlank
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -34,6 +35,7 @@ public class UserDTO {
     private Character sex;
 
     @NotBlank(message = "Email không được để trống")
+    @Email(message = "Email không hợp lệ")
     private String email;
 
     @NotBlank(message = "Ảnh có user không được để trống nếu trống hãy thêm ảnh mặc định")

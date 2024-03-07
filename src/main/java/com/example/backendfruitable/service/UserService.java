@@ -117,8 +117,12 @@ public class UserService {
             user.setAddress(userDTO.getAddress());
             user.setUserImage(userDTO.getUserImage());
             user.setSex(userDTO.getSex());
-            user.setToken_active(codeActive());
+            String randomTokenActive = codeActive();
+            user.setToken_active(randomTokenActive);
             user.setIsActive(false);
+
+            //cấu hình mail
+            String textSendMailActive = "Bạn vừa đăng kí tại khoản ở fashion";
 
             // Lấy 1 list mối quan hệ bên bảng authorize  qua id khi truyền vào từ api mapping của userDTO
             List<AuthorizeDTO> authorizeDTOList = userDTO.getAuthorizeList();
@@ -153,4 +157,5 @@ public class UserService {
     public String codeActive() {
         return UUID.randomUUID().toString();
     }
+
 }
