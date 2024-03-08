@@ -184,7 +184,7 @@ public class UserService {
     public BaseResponse<UserDTO> updateUser(Long userId, UserDTO userDTO){
         BaseResponse<UserDTO> baseResponse = new BaseResponse<>();
         try{
-            User user= userRepository.getUserById(userId);
+            User user = userRepository.getUserById(userId);
             User checkUserEmailExits = userRepository.getUserByEmail(userDTO.getEmail());
             User checkUserUsernameExits = userRepository.getUserByUsername(userDTO.getUsername());
 
