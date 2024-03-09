@@ -10,15 +10,17 @@ import com.example.backendfruitable.entity.Authorize;
 import com.example.backendfruitable.entity.User;
 import com.example.backendfruitable.utils.Constant;
 import com.example.backendfruitable.utils.ConvertRelationship;
-import jakarta.transaction.Transactional;
+import io.minio.GetPresignedObjectUrlArgs;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import io.minio.http.Method;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.*;
 
 @Service
 
@@ -37,6 +39,9 @@ public class UserService {
 
     @Autowired
     private EmailConfig emailConfig;
+
+    @Autowired
+    private MinioClient minioClient;
 
     public BaseResponse<List<UserDTO>> getAllUser() {
         BaseResponse<List<UserDTO>> baseResponse = new BaseResponse<>();
@@ -114,12 +119,12 @@ public class UserService {
         try {
             User checkUserEmailExits = userRepository.getUserByEmail(userDTO.getEmail());
             User checkUserUsernameExits = userRepository.getUserByUsername(userDTO.getUsername());
-            if(checkUserUsernameExits != null){
+            if (checkUserUsernameExits != null) {
                 baseResponse.setMessage(Constant.EXISTS_USER_USERNAME + userDTO.getUsername());
                 baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                 return baseResponse;
             }
-            if(checkUserEmailExits != null){
+            if (checkUserEmailExits != null) {
                 baseResponse.setMessage(Constant.EXISTS_USER_EMAIL + userDTO.getEmail());
                 baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                 return baseResponse;
@@ -135,12 +140,34 @@ public class UserService {
             user.setLastname(userDTO.getLastName());
             user.setAge(userDTO.getAge());
             user.setAddress(userDTO.getAddress());
-            user.setUserImage(userDTO.getUserImage());
             user.setSex(userDTO.getSex());
             String randomTokenActive = codeActive();
             user.setToken_active(randomTokenActive);
             user.setIsActive(false);
 
+            //xử lý hình ảnh
+            try {
+                byte[] imageByte = Base64.getDecoder().decode(Base64.getEncoder().encode(userDTO.getUserImage()));
+                InputStream inputStream = new ByteArrayInputStream(imageByte);
+                String objectName = "user_" + System.currentTimeMillis() + ".jpg";
+                // config minio
+                minioClient.putObject(
+                        PutObjectArgs.builder().bucket("fashion")
+                                .object(objectName)
+                                .stream(inputStream, imageByte.length, -1)
+                                .contentType("image/jpeg").build()
+                );
+
+                // lấy link url sau khi put
+                String imageUrl = minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
+                        .method(Method.GET)
+                        .bucket("fashion")
+                        .object(objectName).build());
+                user.setUserImage(imageUrl.getBytes());
+            } catch (Exception e) {
+                baseResponse.setMessage(Constant.ERORR_TO_ADD_USER + e.getMessage());
+                baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+            }
 
             // Lấy 1 list mối quan hệ bên bảng authorize  qua id khi truyền vào từ api mapping của userDTO
             List<AuthorizeDTO> authorizeDTOList = userDTO.getAuthorizeList();
@@ -162,11 +189,11 @@ public class UserService {
             //cấu hình mail
             String subject = "Active tài khoản tài Fashion";
             String textSendMailActive = "Bạn vừa đăng kí tại khoản ở fashion để tài khoản có thể sử dụng bạn cần xác thực" +
-                    "<Br>Mã xác thực của bạn là:  " + randomTokenActive + "" +
+                    "<Br>Mã xác thực của bạn là:  " + randomTokenActive +
                     "<Br>Bạn có thể xác thực theo đường link sau: " +
-                    "http://localhost:3000/user-active?email=" + user.getEmail() + "&codeActive=" + randomTokenActive + "";
+                    "http://localhost:3000/user-active?email=" + user.getEmail() + "&codeActive=" + randomTokenActive;
 
-                emailConfig.sendMail("phamthanhhuy3062k3@gmail.com", user.getEmail(), subject, textSendMailActive);
+            emailConfig.sendMail("phamthanhhuy3062k3@gmail.com", user.getEmail(), subject, textSendMailActive);
 
             baseResponse.setData(userDTO);
             baseResponse.setMessage(Constant.SUCCESS_ADD_MESSAGE);
@@ -181,35 +208,35 @@ public class UserService {
     }
 
 
-    public BaseResponse<UserDTO> updateUser(Long userId, UserDTO userDTO){
+    public BaseResponse<UserDTO> updateUser(Long userId, UserDTO userDTO) {
         BaseResponse<UserDTO> baseResponse = new BaseResponse<>();
-        try{
+        try {
             User user = userRepository.getUserById(userId);
             User checkUserEmailExits = userRepository.getUserByEmail(userDTO.getEmail());
             User checkUserUsernameExits = userRepository.getUserByUsername(userDTO.getUsername());
 
-           if(user == null){
-               baseResponse.setMessage(Constant.EMPTY_USER_BY_ID + userId);
-               baseResponse.setCode(Constant.NOT_FOUND_CODE);
-               return baseResponse;
-           }else{
-               //nếu email khác với email đã lưu mới check xem nó đã tồn tại trong hệ thống chưa
-               if(!user.getUsername().equals(userDTO.getUsername())){
-                   if(checkUserUsernameExits != null){
-                       baseResponse.setMessage(Constant.EXISTS_USER_USERNAME + userDTO.getUsername());
-                       baseResponse.setCode(Constant.BAD_REQUEST_CODE);
-                       return baseResponse;
-                   }
-               }
-               //nếu username khác với username đã lưu mới check xem nó đã tồn tại trong hệ thống chưa
-               if(!user.getEmail().equals(userDTO.getEmail())){
-                    if(checkUserEmailExits != null){
+            if (user == null) {
+                baseResponse.setMessage(Constant.EMPTY_USER_BY_ID + userId);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
+            } else {
+                //nếu email khác với email đã lưu mới check xem nó đã tồn tại trong hệ thống chưa
+                if (!user.getUsername().equals(userDTO.getUsername())) {
+                    if (checkUserUsernameExits != null) {
+                        baseResponse.setMessage(Constant.EXISTS_USER_USERNAME + userDTO.getUsername());
+                        baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                        return baseResponse;
+                    }
+                }
+                //nếu username khác với username đã lưu mới check xem nó đã tồn tại trong hệ thống chưa
+                if (!user.getEmail().equals(userDTO.getEmail())) {
+                    if (checkUserEmailExits != null) {
                         baseResponse.setMessage(Constant.EXISTS_USER_EMAIL + userDTO.getEmail());
                         baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                         return baseResponse;
                     }
-               }
-           }
+                }
+            }
 
             // cập nhật
             user.setUsername(userDTO.getUsername());
@@ -227,7 +254,7 @@ public class UserService {
 
             List<AuthorizeDTO> authorizeDTOList = userDTO.getAuthorizeList();
             List<Authorize> authorizeList = new ArrayList<>();
-            for(AuthorizeDTO authorizeDTO : authorizeDTOList){
+            for (AuthorizeDTO authorizeDTO : authorizeDTOList) {
                 Authorize authorize = authorizeRepository.getAuthorizeById(authorizeDTO.getAuthorizeId());
                 if (authorize != null) {
                     authorizeList.add(authorize);
@@ -244,7 +271,7 @@ public class UserService {
             baseResponse.setData(userDTO);
             baseResponse.setMessage(Constant.SUCCESS_UPDATE_MESSAGE);
             baseResponse.setCode(Constant.SUCCESS_CODE);
-        }catch (Exception e){
+        } catch (Exception e) {
             baseResponse.setMessage(Constant.ERORR_TO_UPDATE_USER + e.getMessage());
             baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
         }
@@ -277,7 +304,6 @@ public class UserService {
         }
         return baseResponse;
     }
-
 
 
     // random 1 chuoi code Active

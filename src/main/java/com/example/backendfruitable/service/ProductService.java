@@ -8,15 +8,24 @@ import com.example.backendfruitable.Repository.*;
 import com.example.backendfruitable.entity.*;
 import com.example.backendfruitable.utils.Constant;
 import com.example.backendfruitable.utils.ConvertRelationship;
+import io.minio.GetPresignedObjectUrlArgs;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import io.minio.http.Method;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 
 @Service
+@Slf4j
 public class ProductService {
     @Autowired
     private ProductRepository productRepository;
@@ -34,6 +43,9 @@ public class ProductService {
 
     @Autowired
     private ConvertRelationship convertRelationship;
+
+    @Autowired
+    private MinioClient minioClient;
 
 
     public BaseResponse<List<ProductDTO>> getAllProduct() {
@@ -148,11 +160,39 @@ public class ProductService {
             //add csdl
             Product newProduct = productRepository.save(product);
 
-            // add bên image
+            //add bên image
             List<ImageProduct> imageProductList = convertRelationship.convertToImageList(productDTO.getImageList());
-
             for (ImageProduct imageProduct : imageProductList) {
-                imageProduct.setProduct(newProduct);
+                try {
+                    byte[] imageBytes = java.util.Base64.getDecoder().decode(Base64.getEncoder().encodeToString(imageProduct.getData()));
+                    InputStream inputStream = new ByteArrayInputStream(imageBytes);
+                    String objectName = "product_" + System.currentTimeMillis() + ".jpg"; // Tên của file ảnh trong MinIO
+
+                    // Lưu ảnh vào MinIO
+                    minioClient.putObject(
+                            PutObjectArgs.builder()
+                                    .bucket("fashion")
+                                    .object(objectName)
+                                    .stream(inputStream, imageBytes.length, -1)
+                                    .contentType("image/jpeg")
+                                    .build()
+                    );
+                    String imageUrl = minioClient.getPresignedObjectUrl(
+                            GetPresignedObjectUrlArgs.builder()
+                                    .method(Method.GET)
+                                    .bucket("fashion")
+                                    .object(objectName)
+                                    .build()
+                    );
+
+                    imageProduct.setProduct(newProduct);
+                    imageProduct.setData(imageUrl.getBytes());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    baseResponse.setMessage(Constant.ERROR_TO_ADD_PRODUCT + e.getMessage());
+                    baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+                    return baseResponse;
+                }
             }
             imageRepository.saveAll(imageProductList);
 

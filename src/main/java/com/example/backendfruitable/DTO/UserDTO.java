@@ -38,8 +38,8 @@ public class UserDTO {
     @Email(message = "Email không hợp lệ")
     private String email;
 
-    @NotBlank(message = "Ảnh có user không được để trống nếu trống hãy thêm ảnh mặc định")
-    private String userImage;
+    @NotNull(message = "Ảnh có user không được để trống nếu trống hãy thêm ảnh mặc định")
+    private byte[] userImage;
 
     private String tokenActive;
 

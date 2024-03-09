@@ -2,7 +2,9 @@ package com.example.backendfruitable.DTO;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 
@@ -11,8 +13,9 @@ import lombok.Data;
 public class ImageDTO {
     private Long imageId;
 
-    @NotBlank(message = "Dữ liệu ảnh không được để trống")
-    private String data;
+    @NotNull(message = "Ảnh không được để trống")
+    private byte[] data;
+
 
     private ProductDTO product;
 }

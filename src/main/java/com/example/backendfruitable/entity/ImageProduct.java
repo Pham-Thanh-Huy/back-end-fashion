@@ -12,14 +12,15 @@ public class ImageProduct {
     @Column(name = "image_id")
     private Long imageId;
 
-    @Column(name = "data", columnDefinition = "LONGTEXT")
     @Lob
-    private String data;
+    @Column(name = "data", columnDefinition = "LONGTEXT")
+    private byte[] data;
+
+
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "product_id", nullable = false)
     @JsonIgnore
     private Product product;
-
-
 }
+
