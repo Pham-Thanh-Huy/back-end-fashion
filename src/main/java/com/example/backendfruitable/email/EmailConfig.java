@@ -1,6 +1,7 @@
 package com.example.backendfruitable.email;
 
 import jakarta.mail.internet.MimeMessage;
+import jakarta.validation.constraints.Email;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
