@@ -13,8 +13,8 @@ import lombok.Data;
 public class ImageDTO {
     private Long imageId;
 
-    @NotNull(message = "Ảnh không được để trống")
-    private byte[] data;
+    @NotBlank(message = "Ảnh không được để trống")
+    private String data;
 
 
     private ProductDTO product;

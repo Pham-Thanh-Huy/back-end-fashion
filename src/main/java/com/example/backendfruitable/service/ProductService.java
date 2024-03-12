@@ -164,7 +164,7 @@ public class ProductService {
             List<ImageProduct> imageProductList = convertRelationship.convertToImageList(productDTO.getImageList());
             for (ImageProduct imageProduct : imageProductList) {
                 try {
-                    byte[] imageBytes = java.util.Base64.getDecoder().decode(Base64.getEncoder().encodeToString(imageProduct.getData()));
+                    byte[] imageBytes = java.util.Base64.getDecoder().decode(Base64.getEncoder().encodeToString(imageProduct.getData().getBytes()));
                     InputStream inputStream = new ByteArrayInputStream(imageBytes);
                     String objectName = "product_" + System.currentTimeMillis() + ".jpg"; // Tên của file ảnh trong MinIO
 
@@ -186,7 +186,7 @@ public class ProductService {
                     );
 
                     imageProduct.setProduct(newProduct);
-                    imageProduct.setData(imageUrl.getBytes());
+                    imageProduct.setData(imageUrl);
                 } catch (Exception e) {
                     e.printStackTrace();
                     baseResponse.setMessage(Constant.ERROR_TO_ADD_PRODUCT + e.getMessage());

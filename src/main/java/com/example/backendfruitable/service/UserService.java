@@ -63,7 +63,12 @@ public class UserService {
                 userDTO.setLastName(user.getLastname());
                 userDTO.setAge(user.getAge());
                 userDTO.setAddress(user.getAddress());
-                userDTO.setUserImage(user.getUserImage());
+                // Xử lý lấy phần ảnh
+                String objectName = user.getUserImage();
+                String imageUrl = minioClient.getPresignedObjectUrl(
+                        GetPresignedObjectUrlArgs.builder().method(Method.GET).bucket("fashion").object(objectName).build()
+                );
+                userDTO.setUserImage(imageUrl);
                 userDTO.setSex(user.getSex());
                 userDTO.setIsActive(user.getIsActive());
                 userDTO.setAuthorizeList(convertRelationship.converToAuthorizeDTOList(user.getAuthorizeList()));
@@ -156,7 +161,7 @@ public class UserService {
 
             //xử lý hình ảnh
             try {
-                byte[] imageByte = Base64.getDecoder().decode(Base64.getEncoder().encode(userDTO.getUserImage().getBytes()));
+                byte[] imageByte = Base64.getDecoder().decode(Base64.getEncoder().encode(userDTO.getDataImage()));
                 InputStream inputStream = new ByteArrayInputStream(imageByte);
                 String objectName = "user_" + System.currentTimeMillis() + ".jpg";
                 // config minio

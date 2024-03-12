@@ -40,6 +40,11 @@ public class User {
     @Column(name = "email")
     private String email;
 
+
+    @Transient
+    @Lob
+    private byte[] dataImage;
+
     @Column(name = "user_image", columnDefinition = "LONGTEXT")
     @Lob
     private String userImage;

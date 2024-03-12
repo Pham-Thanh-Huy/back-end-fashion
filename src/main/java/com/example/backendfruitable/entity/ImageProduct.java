@@ -14,8 +14,7 @@ public class ImageProduct {
 
     @Lob
     @Column(name = "data", columnDefinition = "LONGTEXT")
-    private byte[] data;
-
+    private String data;
 
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
