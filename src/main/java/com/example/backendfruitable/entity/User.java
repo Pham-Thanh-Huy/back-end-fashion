@@ -42,7 +42,7 @@ public class User {
 
     @Column(name = "user_image", columnDefinition = "LONGTEXT")
     @Lob
-    private byte[] userImage;
+    private String userImage;
 
     @Column(name = "token_active", length = 255)
     private String token_active;

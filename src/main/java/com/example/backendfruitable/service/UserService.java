@@ -98,11 +98,20 @@ public class UserService {
             userDTO.setLastName(user.getLastname());
             userDTO.setAge(user.getAge());
             userDTO.setAddress(user.getAddress());
-            userDTO.setUserImage(user.getUserImage());
             userDTO.setSex(user.getSex());
             userDTO.setIsActive(user.getIsActive());
             userDTO.setAuthorizeList(convertRelationship.converToAuthorizeDTOList(user.getAuthorizeList()));
 
+            // Lấy tên đối tượng của ảnh từ User và chuyển đổi thành đường link
+            String objectName = new String(user.getUserImage());
+            String imageUrl = minioClient.getPresignedObjectUrl(
+                    GetPresignedObjectUrlArgs.builder()
+                            .method(Method.GET)
+                            .bucket("fashion")
+                            .object(objectName)
+                            .build()
+            );
+            userDTO.setUserImage(imageUrl);
 
             baseResponse.setData(userDTO);
             baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
@@ -147,7 +156,7 @@ public class UserService {
 
             //xử lý hình ảnh
             try {
-                byte[] imageByte = Base64.getDecoder().decode(Base64.getEncoder().encode(userDTO.getUserImage()));
+                byte[] imageByte = Base64.getDecoder().decode(Base64.getEncoder().encode(userDTO.getUserImage().getBytes()));
                 InputStream inputStream = new ByteArrayInputStream(imageByte);
                 String objectName = "user_" + System.currentTimeMillis() + ".jpg";
                 // config minio
@@ -159,11 +168,7 @@ public class UserService {
                 );
 
                 // lấy link url sau khi put
-                String imageUrl = minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
-                        .method(Method.GET)
-                        .bucket("fashion")
-                        .object(objectName).build());
-                user.setUserImage(imageUrl.getBytes());
+                user.setUserImage(objectName);
             } catch (Exception e) {
                 baseResponse.setMessage(Constant.ERORR_TO_ADD_USER + e.getMessage());
                 baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);

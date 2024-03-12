@@ -39,7 +39,7 @@ public class UserDTO {
     private String email;
 
     @NotNull(message = "Ảnh có user không được để trống nếu trống hãy thêm ảnh mặc định")
-    private byte[] userImage;
+    private String userImage;
 
     private String tokenActive;
 
