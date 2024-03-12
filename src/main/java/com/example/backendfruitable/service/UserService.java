@@ -103,7 +103,7 @@ public class UserService {
             userDTO.setAuthorizeList(convertRelationship.converToAuthorizeDTOList(user.getAuthorizeList()));
 
             // Lấy tên đối tượng của ảnh từ User và chuyển đổi thành đường link
-            String objectName = new String(user.getUserImage());
+            String objectName = user.getUserImage();
             String imageUrl = minioClient.getPresignedObjectUrl(
                     GetPresignedObjectUrlArgs.builder()
                             .method(Method.GET)
