@@ -13,6 +13,7 @@ import com.example.backendfruitable.utils.ConvertRelationship;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 import io.minio.http.Method;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -300,11 +301,16 @@ public class UserService {
             }
             User user = optionalUser.get();
 
+            // xoá ảnh trong minio
+            String object = user.getUserImage();
+
+            minioClient.removeObject(RemoveObjectArgs.builder().bucket("fashion").object(object).build());
+
             // Xoá tất cả các mối quan hệ nhiều-nhiều với Authorize
             user.getAuthorizeList().clear();
 
-            // Xoá người dùng và lưu thay đổi vào cơ sở dữ liệu
-            userRepository.deleteInBatch(List.of(user));
+            // Xoá người dùng và lưu thay đổi vào cơ sở dữ liệuxs
+            userRepository.deleteAllInBatch(List.of(user));
 
             baseResponse.setMessage(Constant.DELETE_SUCCESS_USER_BY_ID + id);
             baseResponse.setCode(Constant.SUCCESS_CODE);
