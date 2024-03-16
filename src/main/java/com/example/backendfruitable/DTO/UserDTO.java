@@ -28,7 +28,6 @@ public class UserDTO {
     @NotBlank(message = "Họ tên đệm không được để trống ")
     private String lastName;
 
-    @NotBlank(message = "Mật khẩu không được để trống")
     private String password;
 
     @NotNull(message = "Giới tính không được để trống")
@@ -40,8 +39,9 @@ public class UserDTO {
 
     private String userImage;
 
-    @NotNull(message = "Ảnh không được để trống")
     private byte[] dataImage;
+
+    private String imageUrl;
 
     private String tokenActive;
 

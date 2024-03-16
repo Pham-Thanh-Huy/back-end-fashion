@@ -69,7 +69,8 @@ public class UserService {
                 String imageUrl = minioClient.getPresignedObjectUrl(
                         GetPresignedObjectUrlArgs.builder().method(Method.GET).bucket("fashion").object(objectName).build()
                 );
-                userDTO.setUserImage(imageUrl);
+                userDTO.setUserImage(objectName);
+                userDTO.setImageUrl(imageUrl);
                 userDTO.setSex(user.getSex());
                 userDTO.setIsActive(user.getIsActive());
                 userDTO.setAuthorizeList(convertRelationship.converToAuthorizeDTOList(user.getAuthorizeList()));
@@ -117,7 +118,8 @@ public class UserService {
                             .object(objectName)
                             .build()
             );
-            userDTO.setUserImage(imageUrl);
+            userDTO.setUserImage(objectName);
+            userDTO.setImageUrl(imageUrl);
 
             baseResponse.setData(userDTO);
             baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
@@ -132,6 +134,11 @@ public class UserService {
     public BaseResponse<UserDTO> addUser(UserDTO userDTO) {
         BaseResponse<UserDTO> baseResponse = new BaseResponse<>();
         try {
+            if(userDTO.getDataImage() == null || userDTO.getDataImage().length == 0){
+                baseResponse.setMessage(Constant.EMPTY_BASE64_IMAGE);
+                baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                return baseResponse;
+            }
             User checkUserEmailExits = userRepository.getUserByEmail(userDTO.getEmail());
             User checkUserUsernameExits = userRepository.getUserByUsername(userDTO.getUsername());
             if (checkUserUsernameExits != null) {
@@ -145,6 +152,11 @@ public class UserService {
                 return baseResponse;
             }
 
+            if(userDTO.getPassword() == null || userDTO.getPassword().isEmpty()){
+                baseResponse.setMessage(Constant.EMPTY_PASSWORD);
+                baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                return baseResponse;
+            }
 
             User user = new User();
             user.setUserId(userDTO.getUserId());
@@ -251,13 +263,40 @@ public class UserService {
 
             // cập nhật
             user.setUsername(userDTO.getUsername());
-            user.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
             user.setEmail(userDTO.getEmail());
             user.setFirstName(userDTO.getFirstName());
             user.setLastname(userDTO.getLastName());
             user.setAge(userDTO.getAge());
             user.setAddress(userDTO.getAddress());
-            user.setUserImage(userDTO.getUserImage());
+            //update Hình ảnh nếu có update không thì sẽ không update
+            if(userDTO.getDataImage() != null && userDTO.getDataImage().length > 0){
+                byte[] newImage = Base64.getDecoder().decode(Base64.getEncoder().encode(userDTO.getDataImage()));
+                InputStream inputStream = new ByteArrayInputStream(newImage);
+                    // lấy object hiện tại và delete
+                String object = userDTO.getUserImage();
+                // so sánh tiếp xem object của ảnh hiện tại có đúng với ảnh của người đấy hiện tại không
+                if(!object.equals(user.getUserImage())){
+                    baseResponse.setMessage(Constant.ERROR_USER_IMAGE_FOR_USER);
+                    baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                    return baseResponse;
+                }
+                minioClient.removeObject(
+                        RemoveObjectArgs.builder().bucket("fashion").object(object).build()
+                );
+
+                // tiếp tục thêm lại ảnh mới vẫn là tên object đấy
+                minioClient.putObject(
+                        PutObjectArgs.builder()
+                                .bucket("fashion")
+                                .stream(inputStream, newImage.length, -1)
+                                .object(object)
+                                .contentType("image/jpeg")
+                                .build()
+                );
+
+                user.setUserImage(object);
+
+            }
             user.setSex(userDTO.getSex());
 
             // làm mới lại authorize

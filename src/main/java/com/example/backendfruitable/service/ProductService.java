@@ -11,6 +11,7 @@ import com.example.backendfruitable.utils.ConvertRelationship;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 import io.minio.http.Method;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,6 @@ public class ProductService {
     @Autowired
     private MinioClient minioClient;
 
-
     public BaseResponse<List<ProductDTO>> getAllProduct() {
         BaseResponse<List<ProductDTO>> baseResponse = new BaseResponse<>();
         List<ProductDTO> productDTOList = new ArrayList<>();
@@ -62,6 +62,8 @@ public class ProductService {
 
             for (Product product : productList) {
                 ProductDTO productDTO = new ProductDTO();
+                List<ImageProduct> imageProductList = product.getImageList();
+                List<ImageDTO> imageDTOList = new ArrayList<>();
                 productDTO.setProductId(product.getProductId());
                 productDTO.setListedPrice(product.getListedPrice());
                 productDTO.setOutstanding(product.getOutstanding());
@@ -71,9 +73,26 @@ public class ProductService {
                 productDTO.setProductName(product.getProductName());
                 productDTO.setProductPrice(product.getProductPrice());
                 productDTO.setCreatedAt(product.getCreatedAt());
-                productDTO.setImageList(convertRelationship.convertToImageDTOList(product.getImageList()));
                 productDTO.setStock(convertRelationship.convertToStockDTO(product.getStock()));
                 productDTO.setUser(convertRelationship.convertToUserDTO(product.getUser()));
+
+                // xử lý hình ảnh lấy từ minio
+                for (ImageProduct imageProduct : imageProductList) {
+                    ImageDTO imageDTO = new ImageDTO();
+                    // lấy url hình ảnh
+                    String object = imageProduct.getImageProduct();
+                    String imageUrl = minioClient.getPresignedObjectUrl(
+                            GetPresignedObjectUrlArgs.builder().method(Method.GET).bucket("fashion").object(object).build()
+                    );
+                    imageDTO.setImageUrl(imageUrl);
+                    imageDTO.setImageProduct(object);
+                    imageDTOList.add(imageDTO);
+                }
+
+                // add hình ảnh
+                productDTO.setImageList(imageDTOList);
+
+
 
                 //add vào list
                 productDTOList.add(productDTO);
@@ -112,6 +131,22 @@ public class ProductService {
             productDTO.setImageList(convertRelationship.convertToImageDTOList(product.getImageList()));
             productDTO.setStock(convertRelationship.convertToStockDTO(product.getStock()));
             productDTO.setUser(convertRelationship.convertToUserDTO(product.getUser()));
+
+            //xử lý hình ảnh
+            List<ImageProduct> imageProductList = product.getImageList();
+            List<ImageDTO> imageDTOList = new ArrayList<>();
+            for (ImageProduct imageProduct : imageProductList) {
+                ImageDTO imageDTO = new ImageDTO();
+                // lấy url hình ảnh
+                String object = imageProduct.getImageProduct();
+                String imageUrl = minioClient.getPresignedObjectUrl(
+                        GetPresignedObjectUrlArgs.builder().method(Method.GET).bucket("fashion").object(object).build()
+                );
+                imageDTO.setImageUrl(imageUrl);
+                imageDTO.setImageProduct(object);
+                imageDTOList.add(imageDTO);
+            }
+            productDTO.setImageList(imageDTOList);
 
             baseResponse.setData(productDTO);
             baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
@@ -161,39 +196,29 @@ public class ProductService {
             Product newProduct = productRepository.save(product);
 
             //add bên image
-            List<ImageProduct> imageProductList = convertRelationship.convertToImageList(productDTO.getImageList());
-            for (ImageProduct imageProduct : imageProductList) {
-                try {
-                    byte[] imageBytes = java.util.Base64.getDecoder().decode(Base64.getEncoder().encodeToString(imageProduct.getData().getBytes()));
-                    InputStream inputStream = new ByteArrayInputStream(imageBytes);
-                    String objectName = "product_" + System.currentTimeMillis() + ".jpg"; // Tên của file ảnh trong MinIO
+            List<ImageDTO> imageDTOList = productDTO.getImageList();
+            List<ImageProduct> imageProductList = new ArrayList<>();
+            for (ImageDTO imageDTO : imageDTOList) {
+                byte[] imageBytes = java.util.Base64.getDecoder().decode(Base64.getEncoder().encodeToString(imageDTO.getData()));
+                InputStream inputStream = new ByteArrayInputStream(imageBytes);
+                String objectName = "product_" + System.currentTimeMillis() + ".jpg"; // Tên của file ảnh trong MinIO
 
-                    // Lưu ảnh vào MinIO
-                    minioClient.putObject(
-                            PutObjectArgs.builder()
-                                    .bucket("fashion")
-                                    .object(objectName)
-                                    .stream(inputStream, imageBytes.length, -1)
-                                    .contentType("image/jpeg")
-                                    .build()
-                    );
-                    String imageUrl = minioClient.getPresignedObjectUrl(
-                            GetPresignedObjectUrlArgs.builder()
-                                    .method(Method.GET)
-                                    .bucket("fashion")
-                                    .object(objectName)
-                                    .build()
-                    );
-
-                    imageProduct.setProduct(newProduct);
-                    imageProduct.setData(imageUrl);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    baseResponse.setMessage(Constant.ERROR_TO_ADD_PRODUCT + e.getMessage());
-                    baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
-                    return baseResponse;
-                }
+                // Lưu ảnh vào MinIO
+                minioClient.putObject(
+                        PutObjectArgs.builder()
+                                .bucket("fashion")
+                                .object(objectName)
+                                .stream(inputStream, imageBytes.length, -1)
+                                .contentType("image/jpeg")
+                                .build()
+                );
+                ImageProduct imageProduct = new ImageProduct();
+                imageProduct.setImageProduct(objectName);
+                imageProduct.setProduct(product);
+                imageProductList.add(imageProduct);
             }
+
+
             imageRepository.saveAll(imageProductList);
 
             //add bên stock
@@ -261,18 +286,37 @@ public class ProductService {
             product.setUser(user);
 
             productRepository.save(product);
-            //set mối quan hệ bên image
+            //update ảnh
             List<ImageProduct> imageProductExits = new ArrayList<>(product.getImageList());
             List<ImageDTO> imageDTOList = new ArrayList<>(productDTO.getImageList());
+            for (ImageProduct imageProduct : imageProductExits) {
+                for (ImageDTO imageDTO : imageDTOList) {
+                    if (imageProduct.getImageProduct().equals(imageDTO.getImageProduct())) {
+                        if ((imageDTO.getData().length > 0) || imageDTO.getData() != null) {
+                            byte[] newImage = Base64.getDecoder().decode(Base64.getEncoder().encode(imageDTO.getData()));
+                            InputStream inputStream = new ByteArrayInputStream(newImage);
+                            String objectName = imageDTO.getImageProduct();
 
-            for (ImageProduct image : imageProductExits) {
-                for (ImageDTO imageDtoNow : imageDTOList) {
-                    if (image.getImageId() == imageDtoNow.getImageId()) {
-                        image.setData(imageDtoNow.getData());
+//                            xoá ảnh cũ đi
+                            minioClient.removeObject(
+                                    RemoveObjectArgs.builder().bucket("fashion").object(objectName).build()
+                            );
+
+                            // thêm lại với ảnh mới
+                            minioClient.putObject(
+                                    PutObjectArgs.builder().bucket("fashion")
+                                            .stream(inputStream, newImage.length, -1)
+                                            .object(objectName)
+                                            .contentType("image/jpeg")
+                                            .build()
+                            );
+                            imageProduct.setImageProduct(objectName);
+                        }
                         break;
                     }
                 }
             }
+
 
             imageRepository.saveAll(imageProductExits);
 

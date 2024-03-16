@@ -13,8 +13,8 @@ public class ImageProduct {
     private Long imageId;
 
     @Lob
-    @Column(name = "data", columnDefinition = "LONGTEXT")
-    private String data;
+    @Column(name = "image_product", columnDefinition = "TEXT")
+    private String imageProduct;
 
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})

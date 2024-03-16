@@ -14,20 +14,19 @@ public class SecurityEndpoints {
             "/api/user/get/**",
     };
 
-//    public String[] PUBLIC_POST_ENDPOINTS = {
-//
-//    };
+    public static final String[] PUBLIC_POST_ENDPOINTS = {
+            "/api/user/add",
+    };
 
     public static final String[] ADMIN_POST_ENDPOINTS = {
-            "/api/user/add",
             "/api/product/add",
             "/api/category-product/add",
 
     };
 
-//    public String[] PUBLIC_PUT_ENDPOINTS = {
-//
-//    };
+    public static final String[] PUBLIC_PUT_ENDPOINTS = {
+        "/api/user/update"
+    };
 
 
     public static final String[] ADMIN_PUT_ENDPOINTS = {

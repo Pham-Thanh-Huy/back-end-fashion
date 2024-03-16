@@ -14,7 +14,7 @@ public class ConvertRelationship {
         for (ImageProduct imageProduct : imageList) {
             ImageDTO imageDTO = new ImageDTO();
             imageDTO.setImageId(imageProduct.getImageId());
-            imageDTO.setData(imageProduct.getData());
+            imageDTO.setImageProduct(imageProduct.getImageProduct());
             imageDTOList.add(imageDTO);
         }
         return imageDTOList;
@@ -42,7 +42,7 @@ public class ConvertRelationship {
         List<ImageProduct> imageProductList = new ArrayList<>();
         for(ImageDTO imageDTO : imageDTOList){
             ImageProduct imageProduct = new ImageProduct();
-            imageProduct.setData(imageDTO.getData());
+            imageProduct.setImageProduct(imageDTO.getImageProduct());
             imageProductList.add(imageProduct);
         }
         return imageProductList;

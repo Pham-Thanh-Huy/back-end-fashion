@@ -38,8 +38,10 @@ public class SecurityConfiguration {
          http.authorizeHttpRequests(
                 authorize -> authorize
                         .requestMatchers(HttpMethod.GET, SecurityEndpoints.PUBLIC_GET_ENDPOINTS).permitAll()
-                        .requestMatchers(HttpMethod.POST, SecurityEndpoints.ADMIN_POST_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.POST, SecurityEndpoints.PUBLIC_POST_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.PUT, SecurityEndpoints.PUBLIC_PUT_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.GET, SecurityEndpoints.ADMIN_GET_ENDPOINTS).hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.POST, SecurityEndpoints.ADMIN_POST_ENDPOINTS).hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PUT, SecurityEndpoints.ADMIN_PUT_ENDPOINTS).hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, SecurityEndpoints.ADMIN_DELETE_ENPOINTS).hasAuthority("ADMIN")
 //                        .anyRequest().permitAll()

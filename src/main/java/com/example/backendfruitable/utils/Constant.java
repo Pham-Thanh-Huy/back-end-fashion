@@ -29,6 +29,7 @@ public class Constant {
     // Constant với user
     public static final String EMPTY_USER_BY_ID = "Không tìm thấy user với id là: ";
     public static final String EMPTY_ALL_USER = "Không tồn tại người dùng nào";
+    public static final String EMPTY_PASSWORD = "Mật kẩu không được để trống";
     public static final String ERORR_TO_GET_USER = "Lỗi trong quá trình lấy user: ";
     public static final String ERORR_TO_ADD_USER = "Lỗi trong quá trình thêm user:  ";
     public static final String ERORR_TO_DELETE_USER = "Lỗi trong quá trình xoá user:  ";
@@ -36,6 +37,8 @@ public class Constant {
     public static final String EXISTS_USER_USERNAME = "Đã tồn tại username trong hệ thống ";
     public static final String EXISTS_USER_EMAIL = "Đã tồn tại email trong hệ thống ";
     public static final String DELETE_SUCCESS_USER_BY_ID = "Xoá thành công user với id là: ";
+    public static final String EMPTY_BASE64_IMAGE = "Chuỗi ảnh base 64 không được để trống hoặc rỗng";
+    public static final String ERROR_USER_IMAGE_FOR_USER =  "Ảnh hiện tại bạn định sửa không đúng với người dùng hiện tại, vui lòng truyền đúng tên ảnh";
 
     // Constant với Authorize
     public static final String EMPTY_AUTHORIZE_BY_ID = "Không tìm thấy quyền hạn với id là: ";
