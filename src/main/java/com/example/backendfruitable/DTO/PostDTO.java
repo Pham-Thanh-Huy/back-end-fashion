@@ -1,7 +1,8 @@
 package com.example.backendfruitable.DTO;
 
-import com.example.backendfruitable.entity.User;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -11,14 +12,23 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostDTO {
     private Long postId;
+    @NotBlank(message = "Tiêu đề bài viết không được để trống")
     private String postTitle;
+    // byte của imgae để xử lý
+    @NotNull(message = "Hình ảnh bài viết không được để trống")
+    private byte[] dataImage;
+
     private String postImage;
+    private String imageUrl;
+
+    @NotBlank(message = "Chi tiết bài viết không được để trống")
     private String postDetail;
+
     private LocalDate createdAt;
 
 
-    private CategoryPostDTO categoryPostDTO;
-    private UserDTO userDTO;
+    private CategoryPostDTO categoryPost;
+    private UserDTO user;
     private List<CommentDTO> commentDTOList;
 
 }

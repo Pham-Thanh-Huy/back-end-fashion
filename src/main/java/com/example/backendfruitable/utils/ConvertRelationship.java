@@ -2,6 +2,11 @@ package com.example.backendfruitable.utils;
 
 import com.example.backendfruitable.DTO.*;
 import com.example.backendfruitable.entity.*;
+import io.minio.GetPresignedObjectUrlArgs;
+import io.minio.MinioClient;
+import io.minio.http.Method;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -9,6 +14,11 @@ import java.util.List;
 
 @Component
 public class ConvertRelationship {
+    @Autowired
+    private MinioClient minioClient;
+    @Value("${minio.bucket}")
+    private String bucketName;
+
     public List<ImageDTO> convertToImageDTOList(List<ImageProduct> imageList) {
         List<ImageDTO> imageDTOList = new ArrayList<>();
         for (ImageProduct imageProduct : imageList) {
@@ -23,7 +33,7 @@ public class ConvertRelationship {
     public StockDTO convertToStockDTO(Stock stock){
         StockDTO stockDTO = new StockDTO();
         stockDTO.setStockId(stock.getStockId());
-        stockDTO.setQuantity(stock.getStockId());
+        stockDTO.setQuantity(stock.getQuantity());
         return stockDTO;
     }
 
@@ -33,7 +43,17 @@ public class ConvertRelationship {
         userDTO.setLastName(user.getLastname());
         userDTO.setAge(user.getAge());
         userDTO.setAddress(user.getAddress());
-       userDTO.setUserImage(user.getUserImage());
+     // lấy ảnh từ minio
+      try{
+          String object = user.getUserImage();
+          String imageUrl = minioClient.getPresignedObjectUrl(
+                  GetPresignedObjectUrlArgs.builder().method(Method.GET).bucket(bucketName).object(object).build()
+          );
+          userDTO.setUserImage(object);
+          userDTO.setImageUrl(imageUrl);
+      }catch (Exception e){
+          throw new RuntimeException(e.getMessage());
+      }
         return  userDTO;
     }
 
@@ -90,5 +110,7 @@ public class ConvertRelationship {
         }
         return authorizeDTOList;
     }
+
+
 
 }

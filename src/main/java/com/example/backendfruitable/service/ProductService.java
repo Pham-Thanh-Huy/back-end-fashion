@@ -15,6 +15,7 @@ import io.minio.RemoveObjectArgs;
 import io.minio.http.Method;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -47,6 +48,9 @@ public class ProductService {
 
     @Autowired
     private MinioClient minioClient;
+
+    @Value("${minio.bucket}")
+    private String minioBucketName;
 
     public BaseResponse<List<ProductDTO>> getAllProduct() {
         BaseResponse<List<ProductDTO>> baseResponse = new BaseResponse<>();
@@ -82,7 +86,7 @@ public class ProductService {
                     // lấy url hình ảnh
                     String object = imageProduct.getImageProduct();
                     String imageUrl = minioClient.getPresignedObjectUrl(
-                            GetPresignedObjectUrlArgs.builder().method(Method.GET).bucket("fashion").object(object).build()
+                            GetPresignedObjectUrlArgs.builder().method(Method.GET).bucket(minioBucketName).object(object).build()
                     );
                     imageDTO.setImageUrl(imageUrl);
                     imageDTO.setImageProduct(object);
@@ -140,7 +144,7 @@ public class ProductService {
                 // lấy url hình ảnh
                 String object = imageProduct.getImageProduct();
                 String imageUrl = minioClient.getPresignedObjectUrl(
-                        GetPresignedObjectUrlArgs.builder().method(Method.GET).bucket("fashion").object(object).build()
+                        GetPresignedObjectUrlArgs.builder().method(Method.GET).bucket(minioBucketName).object(object).build()
                 );
                 imageDTO.setImageUrl(imageUrl);
                 imageDTO.setImageProduct(object);
@@ -167,13 +171,13 @@ public class ProductService {
             User user = userRepository.getUserById(userId);
             if (categoryProduct == null) {
                 baseResponse.setData(null);
-                baseResponse.setMessage(Constant.EMPTY_CATEGORY_PRODUCT_BY_ID + categoryProductId + "Nên không thể thêm sản phẩm");
+                baseResponse.setMessage(Constant.EMPTY_CATEGORY_PRODUCT_BY_ID + categoryProductId + " " + "Nên không thể thêm sản phẩm");
                 baseResponse.setCode(Constant.NOT_FOUND_CODE);
                 return baseResponse;
             }
             if (user == null) {
                 baseResponse.setData(null);
-                baseResponse.setMessage(Constant.EMPTY_USER_BY_ID + userId + "Nên không thể thêm sản phẩm");
+                baseResponse.setMessage(Constant.EMPTY_USER_BY_ID + userId + " " + "Nên không thể thêm sản phẩm");
                 baseResponse.setCode(Constant.NOT_FOUND_CODE);
                 return baseResponse;
             }
@@ -192,8 +196,7 @@ public class ProductService {
             //add mối quan hệ
             product.setCategoryProduct(categoryProduct);
             product.setUser(user);
-            //add csdl
-            Product newProduct = productRepository.save(product);
+
 
             //add bên image
             List<ImageDTO> imageDTOList = productDTO.getImageList();
@@ -206,7 +209,7 @@ public class ProductService {
                 // Lưu ảnh vào MinIO
                 minioClient.putObject(
                         PutObjectArgs.builder()
-                                .bucket("fashion")
+                                .bucket(minioBucketName)
                                 .object(objectName)
                                 .stream(inputStream, imageBytes.length, -1)
                                 .contentType("image/jpeg")
@@ -219,11 +222,15 @@ public class ProductService {
             }
 
 
-            imageRepository.saveAll(imageProductList);
+
 
             //add bên stock
             Stock stock = convertRelationship.convertToStock(productDTO.getStock());
-            stock.setProduct(newProduct);
+            stock.setProduct(product);
+
+            //add vào csdl
+            productRepository.save(product);
+            imageRepository.saveAll(imageProductList);
             stockRepository.save(stock);
 
 
@@ -255,13 +262,13 @@ public class ProductService {
 
             if (categoryProduct == null) {
                 baseResponse.setData(null);
-                baseResponse.setMessage(Constant.EMPTY_CATEGORY_PRODUCT_BY_ID + categoryProductId + "Nên không thể thêm sản phẩm");
+                baseResponse.setMessage(Constant.EMPTY_CATEGORY_PRODUCT_BY_ID + categoryProductId + " " + "Nên không thể sửa sản phẩm");
                 baseResponse.setCode(Constant.NOT_FOUND_CODE);
                 return baseResponse;
             }
             if (user == null) {
                 baseResponse.setData(null);
-                baseResponse.setMessage(Constant.EMPTY_USER_BY_ID + userId + "Nên không thể thêm sản phẩm");
+                baseResponse.setMessage(Constant.EMPTY_USER_BY_ID + userId + " " + "Nên không thể sửa sản phẩm");
                 baseResponse.setCode(Constant.NOT_FOUND_CODE);
                 return baseResponse;
             }
@@ -285,7 +292,7 @@ public class ProductService {
             product.setCategoryProduct(categoryProduct);
             product.setUser(user);
 
-            productRepository.save(product);
+
             //update ảnh
             List<ImageProduct> imageProductExits = new ArrayList<>(product.getImageList());
             List<ImageDTO> imageDTOList = new ArrayList<>(productDTO.getImageList());
@@ -299,12 +306,12 @@ public class ProductService {
 
 //                            xoá ảnh cũ đi
                             minioClient.removeObject(
-                                    RemoveObjectArgs.builder().bucket("fashion").object(objectName).build()
+                                    RemoveObjectArgs.builder().bucket(minioBucketName).object(objectName).build()
                             );
 
                             // thêm lại với ảnh mới
                             minioClient.putObject(
-                                    PutObjectArgs.builder().bucket("fashion")
+                                    PutObjectArgs.builder().bucket(minioBucketName)
                                             .stream(inputStream, newImage.length, -1)
                                             .object(objectName)
                                             .contentType("image/jpeg")
@@ -318,15 +325,22 @@ public class ProductService {
             }
 
 
-            imageRepository.saveAll(imageProductExits);
+
 
 
             Stock stockExists = product.getStock();
             StockDTO stockDTO = productDTO.getStock();
 
-            if (stockExists.getStockId() == stockDTO.getStockId()) {
-                stockExists.setQuantity(stockDTO.getQuantity());
+            if (stockExists.getStockId() != stockDTO.getStockId()) {
+                baseResponse.setMessage(Constant.ERROR_STOCK_ID_COMPARE_PRODUCT_GET_STOCK_ID);
+                baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                return  baseResponse;
             }
+            stockExists.setQuantity(stockDTO.getQuantity());
+
+            // update vào trong csdl
+            productRepository.save(product);
+            imageRepository.saveAll(imageProductExits);
             stockRepository.save(stockExists);
 
             baseResponse.setData(productDTO);
@@ -351,6 +365,13 @@ public class ProductService {
                 baseResponse.setMessage(Constant.EMPTY_PRODUCT_BY_ID + productId + " nên không thể xoá");
                 baseResponse.setCode(Constant.NOT_FOUND_CODE);
                 return baseResponse;
+            }
+
+            // xoá hình ảnh trong minio
+            List<ImageProduct> imageProductList = product.getImageList();
+            for(ImageProduct imageProduct : imageProductList){
+                String object = imageProduct.getImageProduct();
+                minioClient.removeObject(RemoveObjectArgs.builder().bucket(minioBucketName).object(object).build());
             }
 
             productRepository.delete(product);

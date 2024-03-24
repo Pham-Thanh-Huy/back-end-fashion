@@ -16,6 +16,7 @@ import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.http.Method;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +45,9 @@ public class UserService {
     @Autowired
     private MinioClient minioClient;
 
+    @Value("${minio.bucket}")
+    private String minioBucketName;
+
     public BaseResponse<List<UserDTO>> getAllUser() {
         BaseResponse<List<UserDTO>> baseResponse = new BaseResponse<>();
         List<UserDTO> userDTOList = new ArrayList<>();
@@ -67,7 +71,7 @@ public class UserService {
                 // Xử lý lấy phần ảnh
                 String objectName = user.getUserImage();
                 String imageUrl = minioClient.getPresignedObjectUrl(
-                        GetPresignedObjectUrlArgs.builder().method(Method.GET).bucket("fashion").object(objectName).build()
+                        GetPresignedObjectUrlArgs.builder().method(Method.GET).bucket(minioBucketName).object(objectName).build()
                 );
                 userDTO.setUserImage(objectName);
                 userDTO.setImageUrl(imageUrl);
@@ -114,7 +118,7 @@ public class UserService {
             String imageUrl = minioClient.getPresignedObjectUrl(
                     GetPresignedObjectUrlArgs.builder()
                             .method(Method.GET)
-                            .bucket("fashion")
+                            .bucket(minioBucketName)
                             .object(objectName)
                             .build()
             );
@@ -179,7 +183,7 @@ public class UserService {
                 String objectName = "user_" + System.currentTimeMillis() + ".jpg";
                 // config minio
                 minioClient.putObject(
-                        PutObjectArgs.builder().bucket("fashion")
+                        PutObjectArgs.builder().bucket(minioBucketName)
                                 .object(objectName)
                                 .stream(inputStream, imageByte.length, -1)
                                 .contentType("image/jpeg").build()
@@ -281,13 +285,13 @@ public class UserService {
                     return baseResponse;
                 }
                 minioClient.removeObject(
-                        RemoveObjectArgs.builder().bucket("fashion").object(object).build()
+                        RemoveObjectArgs.builder().bucket(minioBucketName).object(object).build()
                 );
 
                 // tiếp tục thêm lại ảnh mới vẫn là tên object đấy
                 minioClient.putObject(
                         PutObjectArgs.builder()
-                                .bucket("fashion")
+                                .bucket(minioBucketName)
                                 .stream(inputStream, newImage.length, -1)
                                 .object(object)
                                 .contentType("image/jpeg")
@@ -343,7 +347,7 @@ public class UserService {
             // xoá ảnh trong minio
             String object = user.getUserImage();
 
-            minioClient.removeObject(RemoveObjectArgs.builder().bucket("fashion").object(object).build());
+            minioClient.removeObject(RemoveObjectArgs.builder().bucket(minioBucketName).object(object).build());
 
             // Xoá tất cả các mối quan hệ nhiều-nhiều với Authorize
             user.getAuthorizeList().clear();

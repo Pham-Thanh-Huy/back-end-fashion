@@ -43,6 +43,28 @@ public class Constant {
     // Constant với Authorize
     public static final String EMPTY_AUTHORIZE_BY_ID = "Không tìm thấy quyền hạn với id là: ";
 
+    //constant với stock
+    public static final String ERROR_STOCK_ID_COMPARE_PRODUCT_GET_STOCK_ID = "Id của số lượng không trùng với id số lượng của sản phẩm hiện tại nên không thể sửa";
+
+    // Constant với categoryPost
+    public static final String EMPTY_ALL_CATEGORY_POST = "Không tìm thấy danh mục bài viết nào";
+    public static final String EMPTY_CATEGORY_POST_BY_ID = "Không tìm thấy danh mục bài viết với id là: ";
+    public static final String ERROR_TO_GET_CATEGORY_POST = "Lỗi trong quá trình lấy danh mục bài viết: ";
+    public static final String ERROR_TO_ADD_CATEGORY_POST = "Lỗi trong quá trình thêm danh mục bài viết: ";
+    public static final String ERROR_TO_UPDATE_CATEGORY_POST = "Lỗi trong quá trình sửa danh mục bài viết: ";
+    public static final String ERROR_TO_DELETE_CATEGORY_POST = "Lỗi trong quá trình xoá danh mục bài viết: ";
+
+    // Constant với Post
+
+    public static final String EMPTY_ALL_POST = "Không tìm thấy bài viết nào";
+    public static final String EMPTY_POST_BY_ID = "Không tìm thấy bài viết với id là: ";
+    public static final String ERROR_TO_GET_POST = "Lỗi trong quá trình lấy bài viết: ";
+    public static final String ERROR_TO_ADD_POST = "Lỗi trong quá trình thêm bài viết: ";
+    public static final String ERROR_TO_DELETE_POST = "Lỗi trong quá trình thêm bài viết: ";
+    public static final String ERROR_TO_UPDATE_POST = "Lỗi trong quá trình sửa bài viết: ";
+    public static final String DELETE_SUCCESS_POST_ID = "Xoá thành công bài viết với id là: ";
+    public static final String EMPTY_POST_IMAGE_NAME = "Tên ảnh bị trống vui lòng truyền tên ảnh";
+
     // Các constant với các trạng thái code của HTTP STATUS
     public static final int INTERNAL_SERVER_ERROR_CODE = 500;
     public static final int SUCCESS_CODE = 200;

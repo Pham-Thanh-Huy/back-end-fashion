@@ -1,10 +1,12 @@
 package com.example.backendfruitable.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.util.List;
 
 @Entity
+@Data
 @Table(name = "category_post")
 public class CategoryPost {
     @Id
