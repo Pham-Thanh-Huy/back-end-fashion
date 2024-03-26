@@ -55,7 +55,6 @@ public class Constant {
     public static final String ERROR_TO_DELETE_CATEGORY_POST = "Lỗi trong quá trình xoá danh mục bài viết: ";
 
     // Constant với Post
-
     public static final String EMPTY_ALL_POST = "Không tìm thấy bài viết nào";
     public static final String EMPTY_POST_BY_ID = "Không tìm thấy bài viết với id là: ";
     public static final String ERROR_TO_GET_POST = "Lỗi trong quá trình lấy bài viết: ";
@@ -64,6 +63,11 @@ public class Constant {
     public static final String ERROR_TO_UPDATE_POST = "Lỗi trong quá trình sửa bài viết: ";
     public static final String DELETE_SUCCESS_POST_ID = "Xoá thành công bài viết với id là: ";
     public static final String EMPTY_POST_IMAGE_NAME = "Tên ảnh bị trống vui lòng truyền tên ảnh";
+
+    //Constant với login
+    public static final String LOGIN_SUCCESS = "Đăng nhập thành công";
+    public static final String LOGIN_FAILED = "Đăng nhập không thành công, tài khoản hoặc mật khẩu không đúng";
+    public static final String ERROR_TO_LOGIN = "Lỗi trong quá trình đăng nhập: ";
 
     // Các constant với các trạng thái code của HTTP STATUS
     public static final int INTERNAL_SERVER_ERROR_CODE = 500;

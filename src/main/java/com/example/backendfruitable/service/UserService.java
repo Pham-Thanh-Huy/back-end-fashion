@@ -1,10 +1,9 @@
 package com.example.backendfruitable.service;
 
-import com.example.backendfruitable.DTO.AuthorizeDTO;
-import com.example.backendfruitable.DTO.BaseResponse;
-import com.example.backendfruitable.DTO.UserDTO;
+import com.example.backendfruitable.DTO.*;
 import com.example.backendfruitable.Repository.AuthorizeRepository;
 import com.example.backendfruitable.Repository.UserRepository;
+import com.example.backendfruitable.Security.JWT.JWTUtils;
 import com.example.backendfruitable.email.EmailConfig;
 import com.example.backendfruitable.entity.Authorize;
 import com.example.backendfruitable.entity.User;
@@ -17,6 +16,9 @@ import io.minio.RemoveObjectArgs;
 import io.minio.http.Method;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +40,12 @@ public class UserService {
 
     @Autowired
     private AuthorizeRepository authorizeRepository;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JWTUtils jwtUtils;
 
     @Autowired
     private EmailConfig emailConfig;
@@ -370,4 +378,29 @@ public class UserService {
         return UUID.randomUUID().toString();
     }
 
+
+    // Login
+    public BaseResponse<JWTResponse> loginUser(LoginRequest loginRequest){
+        BaseResponse<JWTResponse> baseResponse = new BaseResponse<>();
+        try{
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+            );
+            // nếu login không thành công
+            if(!authentication.isAuthenticated()){
+               baseResponse.setMessage(Constant.LOGIN_FAILED);
+               baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+               return baseResponse;
+            }
+            JWTResponse jwtResponse = new JWTResponse();
+            jwtResponse.setJwt(jwtUtils.generateToken(loginRequest.getUsername()));
+            baseResponse.setData(jwtResponse);
+            baseResponse.setMessage(Constant.LOGIN_SUCCESS);
+        }catch (Exception e){
+            baseResponse.setMessage(Constant.ERROR_TO_LOGIN + e.getMessage());
+            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+        }
+        return baseResponse;
+
+    }
 }
