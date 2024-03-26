@@ -9,7 +9,8 @@ public class SecurityEndpoints {
             "/api/product/get/**",
             "/api/category-product/get/**",
             "/api/category-post/get/**",
-            "/api/post/get/**"
+            "/api/post/get/**",
+            "login"
     };
 
     public static final String[] ADMIN_GET_ENDPOINTS = {

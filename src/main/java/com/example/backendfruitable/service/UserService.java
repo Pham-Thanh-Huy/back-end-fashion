@@ -14,11 +14,13 @@ import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.http.Method;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +29,7 @@ import java.io.InputStream;
 import java.util.*;
 
 @Service
-
+@Slf4j
 public class UserService {
     @Autowired
     private UserRepository userRepository;
@@ -49,6 +51,7 @@ public class UserService {
 
     @Autowired
     private EmailConfig emailConfig;
+
 
     @Autowired
     private MinioClient minioClient;
@@ -386,19 +389,30 @@ public class UserService {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
             );
-            // nếu login không thành công
-            if(!authentication.isAuthenticated()){
-               baseResponse.setMessage(Constant.LOGIN_FAILED);
-               baseResponse.setCode(Constant.BAD_REQUEST_CODE);
-               return baseResponse;
+            // nếu login  thành công
+            if(authentication.isAuthenticated()){
+                User user = userRepository.getUserByUsername(loginRequest.getUsername());
+                if(user.getIsActive() == false){
+                    baseResponse.setMessage(Constant.USER_IS_NOT_ACTIVE);
+                    baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                    return  baseResponse;
+                }
+                JWTResponse jwtResponse = new JWTResponse();
+                jwtResponse.setJwt(jwtUtils.generateToken(loginRequest.getUsername()));
+
+
+                baseResponse.setData(jwtResponse);
+                baseResponse.setMessage(Constant.LOGIN_SUCCESS);
+                baseResponse.setCode(Constant.SUCCESS_CODE);
+                return  baseResponse;
             }
-            JWTResponse jwtResponse = new JWTResponse();
-            jwtResponse.setJwt(jwtUtils.generateToken(loginRequest.getUsername()));
-            baseResponse.setData(jwtResponse);
-            baseResponse.setMessage(Constant.LOGIN_SUCCESS);
+
+            baseResponse.setMessage(Constant.LOGIN_FAILED);
+            baseResponse.setCode(Constant.BAD_REQUEST_CODE);
         }catch (Exception e){
-            baseResponse.setMessage(Constant.ERROR_TO_LOGIN + e.getMessage());
-            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+            log.error("Authentication failed: " + e.getMessage());
+            baseResponse.setMessage(Constant.LOGIN_FAILED);
+            baseResponse.setCode(Constant.BAD_REQUEST_CODE);
         }
         return baseResponse;
 

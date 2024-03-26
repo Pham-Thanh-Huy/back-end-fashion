@@ -47,4 +47,6 @@ public class UserController {
         BaseResponse<UserDTO> baseResponse = userService.deleteUserById(id);
         return  new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
     }
+
+
 }

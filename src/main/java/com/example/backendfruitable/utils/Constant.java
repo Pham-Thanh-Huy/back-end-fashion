@@ -40,6 +40,8 @@ public class Constant {
     public static final String EMPTY_BASE64_IMAGE = "Chuỗi ảnh base 64 không được để trống hoặc rỗng";
     public static final String ERROR_USER_IMAGE_FOR_USER =  "Ảnh hiện tại bạn định sửa không đúng với người dùng hiện tại, vui lòng truyền đúng tên ảnh";
 
+    public static final String USER_IS_NOT_ACTIVE = "Tài khoản này chưa được xác thực, vui lòng xác thực tài khoản";
+
     // Constant với Authorize
     public static final String EMPTY_AUTHORIZE_BY_ID = "Không tìm thấy quyền hạn với id là: ";
 
@@ -68,6 +70,7 @@ public class Constant {
     public static final String LOGIN_SUCCESS = "Đăng nhập thành công";
     public static final String LOGIN_FAILED = "Đăng nhập không thành công, tài khoản hoặc mật khẩu không đúng";
     public static final String ERROR_TO_LOGIN = "Lỗi trong quá trình đăng nhập: ";
+
 
     // Các constant với các trạng thái code của HTTP STATUS
     public static final int INTERNAL_SERVER_ERROR_CODE = 500;
