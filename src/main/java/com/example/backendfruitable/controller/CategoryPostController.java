@@ -29,7 +29,7 @@ public class CategoryPostController {
     }
 
     @Operation(summary = "Lấy toàn bộ danh mục bài viết có phân trang")
-    @GetMapping("/get/all-pagination")
+    @GetMapping("/get/all/pagination")
     public ResponseEntity<BaseResponse<Page<CategoryPostDTO>>> getListCategoryPostPagination(Pageable pageable){
         BaseResponse<Page<CategoryPostDTO>> baseResponse = categoryPostService.getListCategoryPostPagination(pageable);
         return new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));

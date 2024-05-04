@@ -16,7 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
-public class JWTFilter  extends  OncePerRequestFilter{
+public class JWTFilter extends OncePerRequestFilter {
 
     @Autowired
     private AccountService accountService;
@@ -26,10 +26,10 @@ public class JWTFilter  extends  OncePerRequestFilter{
 
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String header = request.getHeader("Authorization");
-        if(header != null && header.startsWith("Bearer ")){
-            String jwt  = header.substring(7);
+        if (header != null && header.startsWith("Bearer ")) {
+            String jwt = header.substring(7);
             String username = jwtUtils.getUsernameClaims(jwt);
-            if(username != null){
+            if (username != null) {
                 UserDetails userDetails = accountService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

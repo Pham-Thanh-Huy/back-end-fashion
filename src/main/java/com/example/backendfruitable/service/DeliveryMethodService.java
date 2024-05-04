@@ -4,7 +4,9 @@ package com.example.backendfruitable.service;
 import com.example.backendfruitable.DTO.BaseResponse;
 import com.example.backendfruitable.DTO.DeliveryMethodDTO;
 import com.example.backendfruitable.entity.DeliveryMethod;
+import com.example.backendfruitable.entity.User;
 import com.example.backendfruitable.repository.DeliveryMethodRepository;
+import com.example.backendfruitable.repository.UserRepository;
 import com.example.backendfruitable.utils.Constant;
 import com.example.backendfruitable.utils.ConvertRelationship;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,8 @@ public class DeliveryMethodService {
 
     @Autowired
     private ConvertRelationship convertRelationship;
+    @Autowired
+    private UserRepository userRepository;
 
     public BaseResponse<List<DeliveryMethodDTO>> getAllDeliveryMethod(){
         BaseResponse<List<DeliveryMethodDTO>> baseResponse = new BaseResponse<>();
@@ -82,6 +86,84 @@ public class DeliveryMethodService {
     }
 
 
+    public BaseResponse<DeliveryMethodDTO> addDeliveryMethod(Long userId, DeliveryMethodDTO deliveryMethodDTO){
+        BaseResponse<DeliveryMethodDTO> baseResponse = new BaseResponse<>();
+        DeliveryMethod deliveryMethod = new DeliveryMethod();
+        try{
+            User user =  userRepository.getUserById(userId);
+            if(user == null){
+                baseResponse.setMessage(Constant.EMPTY_USER_BY_ID + userId);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
+            }
+            deliveryMethod.setName(deliveryMethodDTO.getName());
+            deliveryMethod.setDescription(deliveryMethodDTO.getDescription());
+            deliveryMethod.setDeliveryCost(deliveryMethodDTO.getDeliveryCost());
+            deliveryMethod.setUser(user);
+            deliveryMethodRepository.save(deliveryMethod);
+
+            baseResponse.setData(deliveryMethodDTO);
+            baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
+            baseResponse.setCode(Constant.SUCCESS_CODE);
+
+        }catch (Exception e){
+            baseResponse.setMessage(Constant.ERROR_TO_ADD_DELIVERY_METHOD + e.getMessage());
+            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+        }
+        return baseResponse;
+    }
+
+    public BaseResponse<DeliveryMethodDTO> updateDeliveryMethod(Long deliveryMethodId, Long userId,DeliveryMethodDTO deliveryMethodDTO){
+        BaseResponse<DeliveryMethodDTO> baseResponse = new BaseResponse<>();
+        try{
+            DeliveryMethod deliveryMethod = deliveryMethodRepository.findDeliveryMethodByDeliveryId(deliveryMethodId);
+            if(deliveryMethod == null){
+                baseResponse.setMessage(Constant.EMPTY_DELIVERY_METHOD_BY_ID + deliveryMethodId);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
+            }
+            User user = userRepository.getUserById(userId);
+            if(user == null){
+                baseResponse.setMessage(Constant.EMPTY_USER_BY_ID + userId);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
+            }
+
+            deliveryMethod.setName(deliveryMethodDTO.getName());
+            deliveryMethod.setDescription(deliveryMethodDTO.getDescription());
+            deliveryMethod.setDeliveryCost(deliveryMethodDTO.getDeliveryCost());
+            deliveryMethod.setUser(user);
+            deliveryMethodRepository.save(deliveryMethod);
+
+            baseResponse.setData(deliveryMethodDTO);
+            baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
+            baseResponse.setCode(Constant.SUCCESS_CODE);
+        }catch (Exception e){
+            baseResponse.setMessage(Constant.ERROR_TO_UPDATE_DELIVERY_METHOD + e.getMessage());
+            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+        }
+        return baseResponse;
+    }
+
+
+    public BaseResponse<DeliveryMethodDTO> deleteDeliveryMethod(Long deliveryMethodId){
+        BaseResponse<DeliveryMethodDTO> baseResponse = new BaseResponse<>();
+        try{
+            DeliveryMethod deliveryMethod = deliveryMethodRepository.findDeliveryMethodByDeliveryId(deliveryMethodId);
+            if(deliveryMethod == null){
+                baseResponse.setMessage(Constant.EMPTY_DELIVERY_METHOD_BY_ID + deliveryMethodId);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
+            }
+            deliveryMethodRepository.delete(deliveryMethod);
+            baseResponse.setMessage(Constant.DELETE_SUCCESS_DELIVERY_METHOD + deliveryMethodId);
+            baseResponse.setCode(Constant.SUCCESS_CODE);
+        }catch (Exception e){
+            baseResponse.setMessage(Constant.ERROR_TO_DELETE_DELIVERY_METHOD + e.getMessage());
+            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+        }
+        return baseResponse;
+    }
 
 
 }

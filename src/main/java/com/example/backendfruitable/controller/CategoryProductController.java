@@ -31,7 +31,7 @@ public class CategoryProductController {
 
 
     @Operation(summary = "Lấy toàn bộ danh mục sản phẩm có phân trang")
-    @GetMapping("/get/all-pagination")
+    @GetMapping("/get/all/pagination")
     public ResponseEntity<BaseResponse<Page<CategoryProductDTO>>> getListCategoryProductPagination(Pageable pageable){
         BaseResponse<Page<CategoryProductDTO>> baseResponse = categoryProductService.getListCategoryProductPagination(pageable);
         return new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));

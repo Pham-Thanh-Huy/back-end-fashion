@@ -33,10 +33,10 @@ public class Constant {
     public static final String EMPTY_USER_BY_ID = "Không tìm thấy user với id là: ";
     public static final String EMPTY_ALL_USER = "Không tồn tại người dùng nào";
     public static final String EMPTY_PASSWORD = "Mật kẩu không được để trống";
-    public static final String ERORR_TO_GET_USER = "Lỗi trong quá trình lấy user: ";
-    public static final String ERORR_TO_ADD_USER = "Lỗi trong quá trình thêm user:  ";
-    public static final String ERORR_TO_DELETE_USER = "Lỗi trong quá trình xoá user:  ";
-    public static final String ERORR_TO_UPDATE_USER = "Lỗi trong quá trình cập nhật user:  ";
+    public static final String ERROR_TO_GET_USER = "Lỗi trong quá trình lấy user: ";
+    public static final String ERROR_TO_ADD_USER = "Lỗi trong quá trình thêm user:  ";
+    public static final String ERROR_TO_DELETE_USER = "Lỗi trong quá trình xoá user:  ";
+    public static final String ERROR_TO_UPDATE_USER = "Lỗi trong quá trình cập nhật user:  ";
     public static final String EXISTS_USER_USERNAME = "Đã tồn tại username trong hệ thống ";
     public static final String EXISTS_USER_EMAIL = "Đã tồn tại email trong hệ thống ";
     public static final String DELETE_SUCCESS_USER_BY_ID = "Xoá thành công user với id là: ";
@@ -45,6 +45,7 @@ public class Constant {
     public static final String ERROR_TO_REGISTER_USER = "Lỗi trong quá trình đăng ký người dùng: ";
     public static final String USER_HAS_BEEN_AUTHENTICATED = "User đã được kích hoạt và không thể kích hoạt lại";
     public static final String USER_IS_NOT_ACTIVE = "Tài khoản này chưa được xác thực, vui lòng xác thực tài khoản";
+    public static final String EMPTY_USER_BY_USERNAME = "Không tồn tại username là: ";
 
     // Constant với Authorize
     public static final String EMPTY_AUTHORIZE_BY_ID = "Không tìm thấy quyền hạn với id là: ";
@@ -91,6 +92,7 @@ public class Constant {
     public static final String ERROR_TO_DELETE_DELIVERY_METHOD = "Gặp lỗi trong quá trình xoá phương thức vận chuyển: ";
     public static final String EMPTY_ALL_DELIVERY_METHOD = "Không tìm thấy phương thức vận chuyển nào";
     public static final String EMPTY_DELIVERY_METHOD_BY_ID = "Không tìm thấy phương thức vận chuyển với id là: ";
+    public static final String DELETE_SUCCESS_DELIVERY_METHOD = "Xóa thành công phương thức vận chuyển với id là: ";
 
 
     // Các constant với các trạng thái code của HTTP STATUS

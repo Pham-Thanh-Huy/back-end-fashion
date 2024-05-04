@@ -7,16 +7,18 @@ public class SecurityEndpoints {
 
     public static final String[] PUBLIC_GET_ENDPOINTS = {
             "/api/product/get/**",
-            "/api/category-product/get/**",
+            "/api/category-product/get/all",
+            "/api/category-product/get/*",
             "/api/category-post/get/**",
             "/api/post/get/**",
             "/active",
+            "/api/user/get/by/username",
             "/api/delivery-method/get/**",
-
     };
 
     public static final String[] ADMIN_GET_ENDPOINTS = {
-            "/api/user/get/**",
+            "/api/category-product/get/all/pagination",
+            "/api/user/get/*",
     };
 
     public static final String[] PUBLIC_POST_ENDPOINTS = {
@@ -29,12 +31,13 @@ public class SecurityEndpoints {
             "/api/product/add",
             "/api/category-product/add",
             "/api/category-post/add",
-            "/api/post/add"
+            "/api/post/add",
+            "/api/delivery-method/add"
 
     };
 
     public static final String[] PUBLIC_PUT_ENDPOINTS = {
-        "/api/user/update"
+            "/api/user/update"
     };
 
 
@@ -43,7 +46,8 @@ public class SecurityEndpoints {
             "/api/product/update/**",
             "/api/category-product/update/**",
             "/api/category-post/update/**",
-            "api/post/update/**"
+            "api/post/update/**",
+            "/api/delivery-method/update/*"
     };
 
 
@@ -56,7 +60,8 @@ public class SecurityEndpoints {
             "/api/product/delete/**",
             "/api/category-product/delete/**",
             "/api/category-post/delete/**",
-            "/api/post/delete/**"
+            "/api/post/delete/**",
+            "/api/delivery-method/delete/*"
     };
 
 }

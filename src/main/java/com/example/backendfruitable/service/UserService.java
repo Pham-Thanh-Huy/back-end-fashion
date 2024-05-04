@@ -95,7 +95,7 @@ public class UserService {
             baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
             baseResponse.setCode(Constant.SUCCESS_CODE);
         } catch (Exception e) {
-            baseResponse.setMessage(Constant.ERORR_TO_GET_USER + e.getMessage());
+            baseResponse.setMessage(Constant.ERROR_TO_GET_USER + e.getMessage());
             baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
         }
         return baseResponse;
@@ -139,7 +139,51 @@ public class UserService {
             baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
             baseResponse.setCode(Constant.SUCCESS_CODE);
         } catch (Exception e) {
-            baseResponse.setMessage(Constant.ERORR_TO_GET_USER + e.getMessage());
+            baseResponse.setMessage(Constant.ERROR_TO_GET_USER + e.getMessage());
+            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+        }
+        return baseResponse;
+    }
+
+    public BaseResponse<UserDTO> getByUsername(String username) {
+        BaseResponse<UserDTO> baseResponse = new BaseResponse<>();
+        try {
+            User user = userRepository.getUserByUsername(username);
+            if (user == null) {
+                baseResponse.setData(null);
+                baseResponse.setMessage(Constant.EMPTY_USER_BY_USERNAME + username);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
+            }
+            UserDTO userDTO = new UserDTO();
+            userDTO.setUserId(user.getUserId());
+            userDTO.setUsername(user.getUsername());
+            userDTO.setEmail(user.getEmail());
+            userDTO.setFirstName(user.getFirstName());
+            userDTO.setLastName(user.getLastname());
+            userDTO.setAge(user.getAge());
+            userDTO.setAddress(user.getAddress());
+            userDTO.setSex(user.getSex());
+            userDTO.setIsActive(user.getIsActive());
+            userDTO.setAuthorizeList(convertRelationship.converToAuthorizeDTOList(user.getAuthorizeList()));
+
+            // Lấy tên đối tượng của ảnh từ User và chuyển đổi thành đường link
+            String objectName = user.getUserImage();
+            String imageUrl = minioClient.getPresignedObjectUrl(
+                    GetPresignedObjectUrlArgs.builder()
+                            .method(Method.GET)
+                            .bucket(minioBucketName)
+                            .object(objectName)
+                            .build()
+            );
+            userDTO.setUserImage(objectName);
+            userDTO.setImageUrl(imageUrl);
+
+            baseResponse.setData(userDTO);
+            baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
+            baseResponse.setCode(Constant.SUCCESS_CODE);
+        } catch (Exception e) {
+            baseResponse.setMessage(Constant.ERROR_TO_GET_USER + e.getMessage());
             baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
         }
         return baseResponse;
@@ -220,7 +264,7 @@ public class UserService {
             baseResponse.setMessage(Constant.SUCCESS_ADD_MESSAGE);
             baseResponse.setCode(Constant.SUCCESS_CODE);
         }catch (Exception e){
-            baseResponse.setMessage(Constant.ERORR_TO_ADD_USER + e.getMessage());
+            baseResponse.setMessage(Constant.ERROR_TO_ADD_USER + e.getMessage());
             baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
         }
         return baseResponse;
@@ -409,7 +453,7 @@ public class UserService {
             baseResponse.setMessage(Constant.SUCCESS_UPDATE_MESSAGE);
             baseResponse.setCode(Constant.SUCCESS_CODE);
         } catch (Exception e) {
-            baseResponse.setMessage(Constant.ERORR_TO_UPDATE_USER + e.getMessage());
+            baseResponse.setMessage(Constant.ERROR_TO_UPDATE_USER + e.getMessage());
             baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
         }
         return baseResponse;
@@ -441,7 +485,7 @@ public class UserService {
             baseResponse.setMessage(Constant.DELETE_SUCCESS_USER_BY_ID + id);
             baseResponse.setCode(Constant.SUCCESS_CODE);
         } catch (Exception e) {
-            baseResponse.setMessage(Constant.ERORR_TO_DELETE_USER + e.getMessage());
+            baseResponse.setMessage(Constant.ERROR_TO_DELETE_USER + e.getMessage());
             baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
         }
         return baseResponse;

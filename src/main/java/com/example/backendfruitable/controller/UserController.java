@@ -33,6 +33,13 @@ public class UserController {
         return new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
     }
 
+    @Operation(summary = "Lấy user theo username")
+    @GetMapping("/get/by/username")
+    public ResponseEntity<BaseResponse<UserDTO>> getUserByUsername(@RequestParam String username){
+        BaseResponse<UserDTO> baseResponse = userService.getByUsername(username);
+        return new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
+    }
+
     @Operation(summary = "Thêm user")
     @PostMapping("/add")
     public ResponseEntity<BaseResponse<UserDTO>> addUser(@Valid @RequestBody UserDTO userDTO){

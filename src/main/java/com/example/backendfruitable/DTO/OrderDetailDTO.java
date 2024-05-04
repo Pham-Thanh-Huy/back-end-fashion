@@ -15,7 +15,6 @@ public class OrderDetailDTO {
 
     private String name;
 
-
     private String description;
 
 

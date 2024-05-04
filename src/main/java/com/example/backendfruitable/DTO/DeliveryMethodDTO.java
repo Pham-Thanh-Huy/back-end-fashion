@@ -5,6 +5,8 @@ import com.example.backendfruitable.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;
@@ -14,10 +16,13 @@ import java.util.List;
 public class DeliveryMethodDTO {
     private Long deliveryId;
 
+    @NotBlank(message = "Phương thức vận chuyện không được để trống")
     private String name;
 
+    @NotBlank(message = "Mô tả chi tiết sản phẩm không được để trống")
     private String description;
 
+    @NotNull(message = "Giá tiền cho phương thức vận chuyển khong được để trống")
     private Double deliveryCost;
 
 

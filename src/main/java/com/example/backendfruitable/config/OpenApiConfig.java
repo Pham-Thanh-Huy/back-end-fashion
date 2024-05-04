@@ -23,6 +23,7 @@ public class OpenApiConfig   {
                         .license(new License().name("cửa hàng bán quần áo fashion").url("http://localhost:3000")).version("1.0.0"));
 
     }
+
     @Bean
     public GroupedOpenApi api() {
         return GroupedOpenApi.builder()

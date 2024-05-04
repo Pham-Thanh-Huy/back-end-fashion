@@ -24,7 +24,7 @@ public class DeliveryMethod {
     @Column(name = "delivery_cost")
     private Double deliveryCost;
 
-    @OneToMany(fetch = FetchType.LAZY,
+    @OneToMany(fetch = FetchType.EAGER,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
             mappedBy = "deliveryMethod")
     @JsonIgnore

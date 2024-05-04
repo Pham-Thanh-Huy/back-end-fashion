@@ -32,11 +32,8 @@ public class Recursive {
                 result.addAll(categoryProductListChildren);
             }
         }
-
         return result;
     }
-
-
 //             lấy danh mục sản phẩm đệ quy
         public List<CategoryPost> getAllChildrenCategoryPost(Long parenId){
             List<CategoryPost> result = new ArrayList<>();
@@ -54,7 +51,6 @@ public class Recursive {
                      result.addAll(childrenCategory);
                  }
             }
-
             return result;
         }
 

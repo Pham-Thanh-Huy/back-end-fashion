@@ -1,5 +1,8 @@
 package com.example.backendfruitable.security.JWT;
 
+import com.example.backendfruitable.entity.Authorize;
+import com.example.backendfruitable.entity.User;
+import com.example.backendfruitable.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -13,10 +16,15 @@ import java.util.Map;
 @Component
 public class JWTUtils {
 
+    private final UserRepository userRepository;
     @Value("${jwt.secretKey}")
     private String SECRET;
 
-    private static final long EXPIRATION_TIME = 30*60*1000;
+    private static final long EXPIRATION_TIME = 90*60*1000;
+
+    public JWTUtils(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     private String createToken(Map<String, Object> claims, String username){
         return Jwts.builder()
@@ -31,6 +39,16 @@ public class JWTUtils {
 
     public String generateToken(String username){
         Map<String, Object> claims = new HashMap<>();
+        User user = userRepository.getUserByUsername(username);
+        for(Authorize authorize : user.getAuthorizeList()){
+            if(authorize.getAuthorizeName().equals("ADMIN")){
+                claims.put("isAdmin", true);
+            }
+            if(authorize.getAuthorizeName().equals("USER")){
+                claims.put("isUser", true);
+            }
+        }
+
        return  createToken(claims, username);
     }
 
