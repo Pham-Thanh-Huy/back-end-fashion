@@ -20,7 +20,7 @@ public class JWTUtils {
     @Value("${jwt.secretKey}")
     private String SECRET;
 
-    private static final long EXPIRATION_TIME = 90*60*1000;
+    private static final long EXPIRATION_TIME = 8760*60*60*1000; // 1 year
 
     public JWTUtils(UserRepository userRepository) {
         this.userRepository = userRepository;

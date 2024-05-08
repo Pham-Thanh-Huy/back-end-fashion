@@ -17,9 +17,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration{
+public class SecurityConfiguration {
     @Autowired
     private AccountService accountService;
 
@@ -55,6 +56,8 @@ public class SecurityConfiguration{
                         .requestMatchers(HttpMethod.POST, SecurityEndpoints.ADMIN_POST_ENDPOINTS).hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PUT, SecurityEndpoints.ADMIN_PUT_ENDPOINTS).hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, SecurityEndpoints.ADMIN_DELETE_ENPOINTS).hasAuthority("ADMIN")
+                        .requestMatchers(SecurityEndpoints.AUTH_WHITELIST).permitAll()
+
 
          );
          http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
