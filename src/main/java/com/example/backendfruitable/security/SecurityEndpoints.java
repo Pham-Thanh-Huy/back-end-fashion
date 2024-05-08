@@ -6,8 +6,6 @@ import org.springframework.stereotype.Component;
 public class SecurityEndpoints {
 
     public static final String[] PUBLIC_GET_ENDPOINTS = {
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
             "/api/product/get/**",
             "/api/category-product/get/all",
             "/api/category-product/get/*",
@@ -16,6 +14,7 @@ public class SecurityEndpoints {
             "/active",
             "/api/user/get/by/username",
             "/api/delivery-method/get/**",
+            "/api/payment-method/get/*"
     };
 
     public static final String[] ADMIN_GET_ENDPOINTS = {
@@ -34,7 +33,8 @@ public class SecurityEndpoints {
             "/api/category-product/add",
             "/api/category-post/add",
             "/api/post/add",
-            "/api/delivery-method/add"
+            "/api/delivery-method/add",
+            "/api/payment-method/add"
 
     };
 
@@ -49,7 +49,8 @@ public class SecurityEndpoints {
             "/api/category-product/update/**",
             "/api/category-post/update/**",
             "api/post/update/**",
-            "/api/delivery-method/update/*"
+            "/api/delivery-method/update/*",
+            "/api/payment-method/update/*"
     };
 
 
@@ -63,7 +64,8 @@ public class SecurityEndpoints {
             "/api/category-product/delete/**",
             "/api/category-post/delete/**",
             "/api/post/delete/**",
-            "/api/delivery-method/delete/*"
+            "/api/delivery-method/delete/*",
+            "/api/payment-method/delete/*"
     };
 
     public static final String[] AUTH_WHITELIST = {

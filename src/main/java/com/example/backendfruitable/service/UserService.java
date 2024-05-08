@@ -479,7 +479,7 @@ public class UserService {
             // Xoá tất cả các mối quan hệ nhiều-nhiều với Authorize
             user.getAuthorizeList().clear();
 
-            // Xoá người dùng và lưu thay đổi vào cơ sở dữ liệuxs
+            // Xoá người dùng và lưu thay đổi vào cơ sở dữ liệu
             userRepository.deleteAllInBatch(List.of(user));
 
             baseResponse.setMessage(Constant.DELETE_SUCCESS_USER_BY_ID + id);

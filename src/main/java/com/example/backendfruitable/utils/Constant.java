@@ -94,6 +94,15 @@ public class Constant {
     public static final String EMPTY_DELIVERY_METHOD_BY_ID = "Không tìm thấy phương thức vận chuyển với id là: ";
     public static final String DELETE_SUCCESS_DELIVERY_METHOD = "Xóa thành công phương thức vận chuyển với id là: ";
 
+    // Constant với phương thức thanh toán
+    public static final String ERROR_TO_GET_PAYMENT_METHOD = "Gặp lỗi trong quá trình lấy phương thức thanh toán: ";
+    public static final String ERROR_TO_ADD_PAYMENT_METHOD = "Gặp lỗi trong quá trình thêm phương thức thanh toán: ";
+    public static final String ERROR_TO_UPDATE_PAYMENT_METHOD = "Gặp lỗi trong quá trình update phương thức thanh toán: ";
+    public static final String ERROR_TO_DELETE_PAYMENT_METHOD = "Gặp lỗi trong quá trình xoá phương thức thanh toán: ";
+    public static final String EMPTY_ALL_PAYMENT_METHOD = "Không tìm thấy phương thức thanh toán nào";
+    public static final String EMPTY_PAYMENT_METHOD_BY_ID = "Không tìm thấy phương thức thanh toán với id là: ";
+    public static final String DELETE_SUCCESS_PAYMENT_METHOD = "Xóa thành công phương thức thanh toán với id là: ";
+
 
     // Các constant với các trạng thái code của HTTP STATUS
     public static final int INTERNAL_SERVER_ERROR_CODE = 500;
