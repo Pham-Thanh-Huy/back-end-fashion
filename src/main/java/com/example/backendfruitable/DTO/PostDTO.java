@@ -15,7 +15,6 @@ public class PostDTO {
     @NotBlank(message = "Tiêu đề bài viết không được để trống")
     private String postTitle;
     // byte của imgae để xử lý
-    @NotNull(message = "Hình ảnh bài viết không được để trống")
     private byte[] dataImage;
 
     private String postImage;

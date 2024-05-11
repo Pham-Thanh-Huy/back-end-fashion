@@ -81,6 +81,7 @@ public class PostService {
                 postDTO.setPostDetail(post.getPostDetail());
                 postDTO.setCreatedAt(post.getCreatedAt());
                 postDTO.setUser(convertRelationship.convertToUserDTO(post.getUser()));
+                postDTO.setCategoryPost(convertRelationship.convertToCategoryPostDTO(post.getCategoryPost()));
                 postDTOList.add(postDTO);
             }
 
@@ -120,6 +121,7 @@ public class PostService {
             postDTO.setPostDetail(post.getPostDetail());
             postDTO.setCreatedAt(post.getCreatedAt());
             postDTO.setUser(convertRelationship.convertToUserDTO(post.getUser()));
+            postDTO.setCategoryPost(convertRelationship.convertToCategoryPostDTO(post.getCategoryPost()));
 
             baseResponse.setData(postDTO);
             baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
@@ -163,6 +165,7 @@ public class PostService {
                 postDTO.setPostDetail(post.getPostDetail());
                 postDTO.setCreatedAt(post.getCreatedAt());
                 postDTO.setUser(convertRelationship.convertToUserDTO(post.getUser()));
+                postDTO.setCategoryPost(convertRelationship.convertToCategoryPostDTO(post.getCategoryPost()));
                 postDTOList.add(postDTO);
             }
             baseResponse.setData(postDTOList);
@@ -188,6 +191,11 @@ public class PostService {
             if (categoryPost == null) {
                 baseResponse.setMessage(Constant.EMPTY_CATEGORY_POST_BY_ID + categoryPostId);
                 baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
+            }
+            if(postDTO.getDataImage() == null || postDTO.getDataImage().length == 0){
+                baseResponse.setMessage(Constant.EMPTY_BASE64_IMAGE);
+                baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                 return baseResponse;
             }
 
@@ -241,31 +249,29 @@ public class PostService {
                 baseResponse.setCode(Constant.NOT_FOUND_CODE);
                 return baseResponse;
             }
-            if (postDTO.getPostImage() == null || postDTO.getPostImage().isEmpty()) {
-                baseResponse.setMessage(Constant.EMPTY_POST_IMAGE_NAME);
-                baseResponse.setCode(Constant.BAD_REQUEST_CODE);
-                return baseResponse;
+            if (postDTO.getPostImage() != null && !postDTO.getPostImage().isEmpty()) {
+                if (postDTO.getPostImage().equals(post.getPostImage())) {
+                    byte[] dataImage = Base64.getDecoder().decode(Base64.getEncoder().encode(postDTO.getDataImage()));
+                    InputStream inputStream = new ByteArrayInputStream(dataImage);
+                    String object = postDTO.getPostImage();
+                    // xoá ảnh trong minio
+                    minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(object).build());
+
+                    // thêm lại ảnh mới trong minio (cập nhật)
+                    minioClient.putObject(PutObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(object)
+                            .stream(inputStream, dataImage.length, -1)
+                            .contentType("image/jpeg")
+                            .build());
+
+                    post.setPostImage(object);
+                }
             }
 
             post.setPostTitle(postDTO.getPostTitle());
             // update Image
-            if (postDTO.getPostImage().equals(post.getPostImage())) {
-                byte[] dataImage = Base64.getDecoder().decode(Base64.getEncoder().encode(postDTO.getDataImage()));
-                InputStream inputStream = new ByteArrayInputStream(dataImage);
-                String object = postDTO.getPostImage();
-                // xoá ảnh trong minio
-                minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(object).build());
 
-                // thêm lại ảnh mới trong minio (cập nhật)
-                minioClient.putObject(PutObjectArgs.builder()
-                        .bucket(bucketName)
-                        .object(object)
-                        .stream(inputStream, dataImage.length, -1)
-                        .contentType("image/jpeg")
-                        .build());
-
-                post.setPostImage(object);
-            }
 
             post.setPostDetail(postDTO.getPostDetail());
             post.setUser(user);

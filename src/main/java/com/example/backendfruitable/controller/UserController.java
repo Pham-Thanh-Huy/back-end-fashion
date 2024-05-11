@@ -6,6 +6,8 @@ import com.example.backendfruitable.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,6 +25,13 @@ public class UserController {
     @GetMapping("/get/all")
     public ResponseEntity<BaseResponse<List<UserDTO>>> getAllUser(){
         BaseResponse<List<UserDTO>> baseResponse = userService.getAllUser();
+        return new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
+    }
+
+    @Operation(summary = "Lấy danh sách User theo Authorize")
+    @GetMapping("/get/by/authorize-name")
+    public ResponseEntity<BaseResponse<Page<UserDTO>>> getListUserByAuthorizeName(Pageable pageable, @RequestParam String authorizeName){
+        BaseResponse<Page<UserDTO>> baseResponse = userService.getListUserByAuthorizeName(pageable, authorizeName);
         return new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
     }
 

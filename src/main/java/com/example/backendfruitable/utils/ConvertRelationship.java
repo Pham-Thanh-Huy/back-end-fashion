@@ -42,6 +42,7 @@ public class ConvertRelationship {
         userDTO.setFirstName(user.getFirstName());
         userDTO.setLastName(user.getLastname());
         userDTO.setAge(user.getAge());
+        userDTO.setEmail(user.getEmail());
         userDTO.setAddress(user.getAddress());
      // lấy ảnh từ minio
       try{
@@ -118,6 +119,14 @@ public class ConvertRelationship {
         categoryProductDTO.setCategoryName(categoryProduct.getCategoryName());
         categoryProductDTO.setParentId(categoryProduct.getParentId());
         return categoryProductDTO;
+    }
+
+    public CategoryPostDTO convertToCategoryPostDTO(CategoryPost categoryPost){
+        CategoryPostDTO categoryPostDTO = new CategoryPostDTO();
+        categoryPostDTO.setCategoryId(categoryPost.getCategoryId());
+        categoryPostDTO.setCategoryName(categoryPost.getCategoryName());
+        categoryPostDTO.setParentId(categoryPost.getParentId());
+        return categoryPostDTO;
     }
 
 

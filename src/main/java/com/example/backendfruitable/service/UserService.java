@@ -17,6 +17,9 @@ import io.minio.http.Method;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -100,6 +103,53 @@ public class UserService {
         }
         return baseResponse;
     }
+
+    public BaseResponse<Page<UserDTO>> getListUserByAuthorizeName(Pageable pageable, String authorizeName) {
+        BaseResponse<Page<UserDTO>> baseResponse = new BaseResponse<>();
+        List<UserDTO> userDTOList = new ArrayList<>();
+        try {
+            Page<User> userPage = userRepository.getUserByAuthorizeName(pageable, authorizeName);
+            if (userPage == null || userPage.isEmpty()) {
+                baseResponse.setData(null);
+                baseResponse.setMessage(Constant.EMPTY_LIST_USER_BY_AUTHORIZE_NAME + authorizeName);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
+            }
+            for (User user : userPage) {
+                UserDTO userDTO = new UserDTO();
+                userDTO.setUserId(user.getUserId());
+                userDTO.setUsername(user.getUsername());
+                userDTO.setEmail(user.getEmail());
+                userDTO.setFirstName(user.getFirstName());
+                userDTO.setLastName(user.getLastname());
+                userDTO.setAge(user.getAge());
+                userDTO.setAddress(user.getAddress());
+                // Xử lý lấy phần ảnh
+                String objectName = user.getUserImage();
+                String imageUrl = minioClient.getPresignedObjectUrl(
+                        GetPresignedObjectUrlArgs.builder().method(Method.GET).bucket(minioBucketName).object(objectName).build()
+                );
+                userDTO.setUserImage(objectName);
+                userDTO.setImageUrl(imageUrl);
+                userDTO.setSex(user.getSex());
+                userDTO.setIsActive(user.getIsActive());
+                userDTO.setAuthorizeList(convertRelationship.converToAuthorizeDTOList(user.getAuthorizeList()));
+                userDTOList.add(userDTO);
+            }
+
+            Page<UserDTO> userDTOPage = new PageImpl<>(userDTOList, pageable, userPage.getTotalElements());
+
+            baseResponse.setData(userDTOPage);
+            baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
+            baseResponse.setCode(Constant.SUCCESS_CODE);
+        } catch (Exception e) {
+            baseResponse.setMessage(Constant.ERROR_TO_GET_USER + e.getMessage());
+            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+        }
+        return baseResponse;
+    }
+
+
 
     public BaseResponse<UserDTO> getUserById(Long id) {
         BaseResponse<UserDTO> baseResponse = new BaseResponse<>();

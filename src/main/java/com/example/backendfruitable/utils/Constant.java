@@ -32,6 +32,7 @@ public class Constant {
     // Constant với user
     public static final String EMPTY_USER_BY_ID = "Không tìm thấy user với id là: ";
     public static final String EMPTY_ALL_USER = "Không tồn tại người dùng nào";
+    public static final String EMPTY_LIST_USER_BY_AUTHORIZE_NAME = "Không tồn tại người dùng nào với quyền là: ";
     public static final String EMPTY_PASSWORD = "Mật kẩu không được để trống";
     public static final String ERROR_TO_GET_USER = "Lỗi trong quá trình lấy user: ";
     public static final String ERROR_TO_ADD_USER = "Lỗi trong quá trình thêm user:  ";

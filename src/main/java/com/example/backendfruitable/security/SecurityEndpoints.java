@@ -20,6 +20,7 @@ public class SecurityEndpoints {
     public static final String[] ADMIN_GET_ENDPOINTS = {
             "/api/category-product/get/all/pagination",
             "/api/user/get/*",
+            "/api/user/get/by/authorize-name"
     };
 
     public static final String[] PUBLIC_POST_ENDPOINTS = {
@@ -65,7 +66,7 @@ public class SecurityEndpoints {
             "/api/category-post/delete/**",
             "/api/post/delete/**",
             "/api/delivery-method/delete/*",
-            "/api/payment-method/delete/*"
+            "/api/payment-method/delete/*",
     };
 
     public static final String[] AUTH_WHITELIST = {
