@@ -110,6 +110,9 @@ public class Constant {
     public static final String DELETE_SUCCESS_PAYMENT_METHOD = "Xóa thành công phương thức thanh toán với id là: ";
 
 
+    public static final String ERROR_TO_ADD_ORDER = "Gặp lỗi trong quá trình thêm đơn hàng: ";
+
+
     // Các constant với các trạng thái code của HTTP STATUS
     public static final int INTERNAL_SERVER_ERROR_CODE = 500;
     public static final int SUCCESS_CODE = 200;
