@@ -106,6 +106,7 @@ public class ConvertRelationship {
         List<AuthorizeDTO> authorizeDTOList = new ArrayList<>();
         for(Authorize authorize : authorizeList){
             AuthorizeDTO authorizeDTO = new AuthorizeDTO();
+            authorizeDTO.setAuthorizeId(authorize.getAuthorizeId());
             authorizeDTO.setAuthorizeName(authorize.getAuthorizeName());
             authorizeDTOList.add(authorizeDTO);
         }

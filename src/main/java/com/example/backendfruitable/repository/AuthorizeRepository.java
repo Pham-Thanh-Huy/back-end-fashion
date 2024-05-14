@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface AuthorizeRepository  extends JpaRepository<Authorize, Long> {
 
     @Query("SELECT a FROM Authorize a WHERE a.authorizeId = :id ")
-     Authorize getAuthorizeById(@Param("id") Long id);
+     Authorize getAuthorizeById(@Param("id") Integer id);
 
     @Query("SELECT a FROM Authorize a WHERE a.authorizeName = :authorizeName")
     Authorize getAuthorizeByName(@Param("authorizeName") String authorizeName);

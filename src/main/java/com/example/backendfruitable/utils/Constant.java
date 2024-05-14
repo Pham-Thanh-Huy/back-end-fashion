@@ -52,6 +52,11 @@ public class Constant {
     public static final String EMPTY_AUTHORIZE_BY_ID = "Không tìm thấy quyền hạn với id là: ";
     public static final String NOT_EXISTS_AUTHORIZE_USER_TO_REGISTER = "Không tồn tại authorize user, vui lòng thêm authorize USER vào trong database";
     public static final String EMPTY_AUTHORIZE_LIST = "Quyền của người dùng không được để trống";
+    public static final String ERROR_TO_GET_AUTHOIZE = "Lỗi trong quá trình lấy danh sách các quyền trong hệ thống: ";
+    public static final String ERROR_TO_ADD_AUTHORIZE = "Lỗi trong quá trình thêm quyền: ";
+    public static final String ERROR_TO_UPDATE_AUTHORIZE = "Lỗi trong quá trình sửa quyền: ";
+    public static final String ERROR_TO_DELETE_AUTHORIZE = "Lỗi trong quá trình xóa quyền: ";
+    public static final String EMPTY_ALL_AUTHORIZE = "Không tìm thấy quyền nào";
 
 
     //Constant với Authen

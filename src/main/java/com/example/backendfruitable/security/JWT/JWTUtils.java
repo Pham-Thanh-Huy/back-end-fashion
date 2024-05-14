@@ -47,6 +47,9 @@ public class JWTUtils {
             if(authorize.getAuthorizeName().equals("USER")){
                 claims.put("isUser", true);
             }
+            if(authorize.getAuthorizeName().equals("STAFF")){
+                claims.put("isStaff", true);
+            }
         }
 
        return  createToken(claims, username);

@@ -52,10 +52,13 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, SecurityEndpoints.PUBLIC_GET_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.POST, SecurityEndpoints.PUBLIC_POST_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.PUT, SecurityEndpoints.PUBLIC_PUT_ENDPOINTS).permitAll()
-                        .requestMatchers(HttpMethod.GET, SecurityEndpoints.ADMIN_GET_ENDPOINTS).hasAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.POST, SecurityEndpoints.ADMIN_POST_ENDPOINTS).hasAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, SecurityEndpoints.ADMIN_PUT_ENDPOINTS).hasAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, SecurityEndpoints.ADMIN_DELETE_ENPOINTS).hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.GET, SecurityEndpoints.ADMIN_STAFF_GET_ENDPOINTS).hasAnyAuthority("ADMIN", "STAFF")
+                        .requestMatchers(HttpMethod.POST, SecurityEndpoints.ADMIN_STAFF_POST_ENDPOINTS).hasAnyAuthority("ADMIN", "STAFF")
+                        .requestMatchers(HttpMethod.PUT, SecurityEndpoints.ADMIN_STAFF_PUT_ENDPOINTS).hasAnyAuthority("ADMIN", "STAFF")
+                        .requestMatchers(HttpMethod.DELETE, SecurityEndpoints.ADMIN_STAFF_DELETE_ENPOINTS).hasAnyAuthority("ADMIN", "STAFF")
+                        .requestMatchers(HttpMethod.POST, SecurityEndpoints.ADMIN_POST_ENDPOINTS).hasAnyAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, SecurityEndpoints.ADMIN_PUT_ENDPOINTS).hasAnyAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, SecurityEndpoints.ADMIN_DELETE_ENDPOINTS).hasAnyAuthority("ADMIN")
                         .requestMatchers(SecurityEndpoints.AUTH_WHITELIST).permitAll()
 
 
