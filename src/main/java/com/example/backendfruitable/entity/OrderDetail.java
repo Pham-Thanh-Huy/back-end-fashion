@@ -16,8 +16,8 @@ public class OrderDetail {
     @Column(name = "quantity")
     private Long quantity;
 
-    @Column(name = "price")
-    private Double price;
+    @Column(name = "total_price")
+    private Double totalPrice;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "product_id")

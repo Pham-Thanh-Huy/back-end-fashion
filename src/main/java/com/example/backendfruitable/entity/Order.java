@@ -18,6 +18,9 @@ public class Order {
     @Column(name = "address")
     private String address;
 
+    @Column(name = "note", columnDefinition = "TEXT", nullable = true)
+    private String note;
+
     @Column(name = "created_at")
     private LocalDate createdAt;
 

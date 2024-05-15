@@ -26,7 +26,8 @@ public class SecurityEndpoints {
 
     public static final String[] PUBLIC_POST_ENDPOINTS = {
             "/login",
-            "/register"
+            "/register",
+            "/api/order/add"
     };
 
 

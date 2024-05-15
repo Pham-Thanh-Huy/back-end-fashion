@@ -99,6 +99,7 @@ public class Constant {
     public static final String EMPTY_ALL_DELIVERY_METHOD = "Không tìm thấy phương thức vận chuyển nào";
     public static final String EMPTY_DELIVERY_METHOD_BY_ID = "Không tìm thấy phương thức vận chuyển với id là: ";
     public static final String DELETE_SUCCESS_DELIVERY_METHOD = "Xóa thành công phương thức vận chuyển với id là: ";
+    public static final String DELIVERY_METHOD_ID_REQUIRED = "Trường id trong phương thức vận chuyển không được để trống";
 
     // Constant với phương thức thanh toán
     public static final String ERROR_TO_GET_PAYMENT_METHOD = "Gặp lỗi trong quá trình lấy phương thức thanh toán: ";
@@ -108,10 +109,15 @@ public class Constant {
     public static final String EMPTY_ALL_PAYMENT_METHOD = "Không tìm thấy phương thức thanh toán nào";
     public static final String EMPTY_PAYMENT_METHOD_BY_ID = "Không tìm thấy phương thức thanh toán với id là: ";
     public static final String DELETE_SUCCESS_PAYMENT_METHOD = "Xóa thành công phương thức thanh toán với id là: ";
-
+    public static final String PAYMENT_METHOD_ID_REQUIRED = "Trường id trong phương thức thanh toán không được để trống";
 
     public static final String ERROR_TO_ADD_ORDER = "Gặp lỗi trong quá trình thêm đơn hàng: ";
 
+    //Constant với orderDetail
+    public static final String PRICE_ORDER_DETAIL_REQUIRED = "Trường giá tiền trong chi tiết sản phẩm không được để trống";
+    public static final String QUANTITY_ORDER_DETAIL_REQUIRED = "Trường số lượng sản phẩm trong chi tiết sản phẩm không được để trống";
+    public static final String PRODUCT_ID_ORDER_DETAIL_REQUIRED = "Trường số id sản phẩm trong chi tiết sản phẩm không được để trống";
+    public static final String ORDER_DETAIL_REQUIRED = "Chi tiết sản phẩm không được để trống";
 
     // Các constant với các trạng thái code của HTTP STATUS
     public static final int INTERNAL_SERVER_ERROR_CODE = 500;

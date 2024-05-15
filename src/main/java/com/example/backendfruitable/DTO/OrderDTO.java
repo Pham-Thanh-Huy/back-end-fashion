@@ -16,17 +16,14 @@ public class OrderDTO {
     @NotBlank(message = "Địa chỉ không được để trống")
     private String address;
 
+    private String note;
 
     private LocalDate createdAt;
 
-    @NotNull(message = "Phương thức vận chuyển không được để trống")
+
     private DeliveryMethodDTO deliveryMethod;
 
-
-    @NotNull(message = "Phương thức thanh toán không được để trống")
     private PaymentMethodDTO paymentMethod;
-
-
 
     private UserDTO user;
 
