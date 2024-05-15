@@ -15,12 +15,14 @@ public class OrderDTO {
 
     @NotBlank(message = "Địa chỉ không được để trống")
     private String address;
-
     private String note;
-
     private LocalDate createdAt;
 
+    // các trường tự tạo thêm phục vụ xử lý dto
+    private Double totalPrice;
 
+
+    // các relation ship
     private DeliveryMethodDTO deliveryMethod;
 
     private PaymentMethodDTO paymentMethod;

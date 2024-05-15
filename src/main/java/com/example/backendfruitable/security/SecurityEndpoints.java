@@ -21,7 +21,8 @@ public class SecurityEndpoints {
             "/api/category-product/get/all/pagination",
             "/api/user/get/*",
             "/api/user/get/by/authorize-name",
-            "/api/authorize/get/*"
+            "/api/authorize/get/*",
+            "/api/order/get/all"
     };
 
     public static final String[] PUBLIC_POST_ENDPOINTS = {
@@ -42,7 +43,7 @@ public class SecurityEndpoints {
             "/api/category-post/add",
             "/api/post/add",
             "/api/delivery-method/add",
-            "/api/payment-method/add"
+            "/api/payment-method/add",
 
     };
 

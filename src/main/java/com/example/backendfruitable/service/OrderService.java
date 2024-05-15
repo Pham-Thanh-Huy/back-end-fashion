@@ -3,9 +3,12 @@ package com.example.backendfruitable.service;
 import com.example.backendfruitable.DTO.BaseResponse;
 import com.example.backendfruitable.DTO.OrderDTO;
 import com.example.backendfruitable.DTO.OrderDetailDTO;
+import com.example.backendfruitable.DTO.UserDTO;
 import com.example.backendfruitable.entity.*;
 import com.example.backendfruitable.repository.*;
 import com.example.backendfruitable.utils.Constant;
+import com.example.backendfruitable.utils.ConvertRelationship;
+import org.apache.tomcat.util.bcel.Const;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +30,51 @@ public class OrderService {
     private PaymentMethodRepository paymentMethodRepository;
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private ConvertRelationship convertRelationship;
+
+    public BaseResponse<List<OrderDTO>> getAllOrders() {
+        BaseResponse<List<OrderDTO>> baseResponse = new BaseResponse<>();
+        try{
+            List<Order> orderList = orderRepository.findAll();
+            if(orderList == null || orderList.isEmpty()){
+                baseResponse.setMessage(Constant.EMPTY_ALL_ORDER);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return  baseResponse;
+            }
+            List<OrderDTO> orderDTOList = new ArrayList<>();
+            for(Order order : orderList){
+                OrderDTO orderDTO = new OrderDTO();
+                orderDTO.setOrderId(order.getOrderId());
+                orderDTO.setAddress(order.getAddress());
+                orderDTO.setDeliveryMethod(convertRelationship.convertToDeliveryMethodDTO(order.getDeliveryMethod()));
+                orderDTO.setPaymentMethod(convertRelationship.convertToPaymentMethodDTO(order.getPaymentMethod()));
+
+                Double totalPrice = order.getDeliveryMethod().getDeliveryCost() + order.getPaymentMethod().getPaymentCost();
+                List<OrderDetailDTO> orderDetailDTOList = new ArrayList<>();
+                for(OrderDetail orderDetail : order.getOrderDetailList()){
+                    OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
+                    orderDetailDTO.setOrderDetailId(orderDetail.getOrderDetailId());
+                    orderDetailDTO.setQuantity(orderDetail.getQuantity());
+                    orderDetailDTO.setTotalPrice(orderDetail.getTotalPrice());
+                    orderDetailDTO.setProduct(convertRelationship.convertToProductDTO(orderDetail.getProduct()));
+                    totalPrice = totalPrice + orderDetail.getTotalPrice();
+                    orderDetailDTOList.add(orderDetailDTO);
+                }
+                orderDTO.setOrderDetailList(orderDetailDTOList);
+                orderDTO.setTotalPrice(totalPrice);
+                orderDTOList.add(orderDTO);
+            }
+            baseResponse.setData(orderDTOList);
+            baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
+            baseResponse.setCode(Constant.SUCCESS_CODE);
+        }catch (Exception e){
+            baseResponse.setMessage(Constant.ERROR_TO_GET_ORDER + e.getMessage());
+            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+        }
+        return baseResponse;
+    }
+
 
     public BaseResponse<OrderDTO> createOrder(Long userId, OrderDTO orderDTO){
         BaseResponse<OrderDTO> baseResponse = new BaseResponse<>();
@@ -86,7 +134,7 @@ public class OrderService {
             // tiếp tục check các sản phẩm trong orderDetails
             for(OrderDetailDTO orderDetailDTO : orderDTO.getOrderDetailList()){
                 OrderDetail orderDetail = new OrderDetail();
-
+                    
                 if(orderDetailDTO.getQuantity() == null){
                     baseResponse.setMessage(Constant.QUANTITY_ORDER_DETAIL_REQUIRED);
                     baseResponse.setCode(Constant.BAD_REQUEST_CODE);
@@ -117,6 +165,9 @@ public class OrderService {
 
             orderRepository.save(order);
             orderDetailRepository.saveAll(orderDetailList);
+
+            UserDTO  userDTO = convertRelationship.convertToUserDTO(user);
+            orderDTO.setUser(userDTO);
 
             baseResponse.setData(orderDTO);
             baseResponse.setMessage(Constant.SUCCESS_ADD_MESSAGE);

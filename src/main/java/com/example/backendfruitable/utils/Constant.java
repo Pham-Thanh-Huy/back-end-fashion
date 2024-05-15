@@ -111,10 +111,12 @@ public class Constant {
     public static final String DELETE_SUCCESS_PAYMENT_METHOD = "Xóa thành công phương thức thanh toán với id là: ";
     public static final String PAYMENT_METHOD_ID_REQUIRED = "Trường id trong phương thức thanh toán không được để trống";
 
+    //constant với order
     public static final String ERROR_TO_ADD_ORDER = "Gặp lỗi trong quá trình thêm đơn hàng: ";
+    public static final String ERROR_TO_GET_ORDER = "Gặp lỗi trong quá trình lấy đơn hàng: ";
+    public static final String EMPTY_ALL_ORDER = "Không tồn tại đơn hàng nào";
 
     //Constant với orderDetail
-    public static final String PRICE_ORDER_DETAIL_REQUIRED = "Trường giá tiền trong chi tiết sản phẩm không được để trống";
     public static final String QUANTITY_ORDER_DETAIL_REQUIRED = "Trường số lượng sản phẩm trong chi tiết sản phẩm không được để trống";
     public static final String PRODUCT_ID_ORDER_DETAIL_REQUIRED = "Trường số id sản phẩm trong chi tiết sản phẩm không được để trống";
     public static final String ORDER_DETAIL_REQUIRED = "Chi tiết sản phẩm không được để trống";

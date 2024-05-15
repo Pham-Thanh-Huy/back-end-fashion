@@ -130,5 +130,22 @@ public class ConvertRelationship {
         return categoryPostDTO;
     }
 
+    public DeliveryMethodDTO convertToDeliveryMethodDTO(DeliveryMethod deliveryMethod){
+        DeliveryMethodDTO deliveryMethodDTO = new DeliveryMethodDTO();
+        deliveryMethodDTO.setDeliveryId(deliveryMethod.getDeliveryId());
+        deliveryMethodDTO.setName(deliveryMethod.getName());
+        deliveryMethodDTO.setDeliveryCost(deliveryMethod.getDeliveryCost());
+        deliveryMethodDTO.setDescription(deliveryMethod.getDescription());
+        return deliveryMethodDTO;
+    }
+
+    public PaymentMethodDTO convertToPaymentMethodDTO(PaymentMethod paymentMethod){
+        PaymentMethodDTO paymentMethodDTO = new PaymentMethodDTO();
+        paymentMethodDTO.setPaymentId(paymentMethod.getPaymentId());
+        paymentMethodDTO.setPaymentName(paymentMethod.getPaymentName());
+        paymentMethodDTO.setPaymentCost(paymentMethod.getPaymentCost());
+        paymentMethodDTO.setDescription(paymentMethod.getDescription());
+        return paymentMethodDTO;
+    }
 
 }
