@@ -14,7 +14,8 @@ public class SecurityEndpoints {
             "/active",
             "/api/user/get/by/username",
             "/api/delivery-method/get/**",
-            "/api/payment-method/get/*"
+            "/api/payment-method/get/*",
+            "/api/order/get/*"
     };
 
     public static final String[] ADMIN_STAFF_GET_ENDPOINTS = {
@@ -22,7 +23,7 @@ public class SecurityEndpoints {
             "/api/user/get/*",
             "/api/user/get/by/authorize-name",
             "/api/authorize/get/*",
-            "/api/order/get/all"
+            "/api/order/get/all/pagination"
     };
 
     public static final String[] PUBLIC_POST_ENDPOINTS = {
@@ -58,7 +59,8 @@ public class SecurityEndpoints {
             "/api/category-post/update/**",
             "api/post/update/**",
             "/api/delivery-method/update/*",
-            "/api/payment-method/update/*"
+            "/api/payment-method/update/*",
+            "/api/order/update/*"
     };
     public static final String[] ADMIN_PUT_ENDPOINTS = {
             "/api/user/update/**",

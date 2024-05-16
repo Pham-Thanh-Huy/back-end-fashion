@@ -16,6 +16,7 @@ public class OrderDTO {
     @NotBlank(message = "Địa chỉ không được để trống")
     private String address;
     private String note;
+    private String status;
     private LocalDate createdAt;
 
     // các trường tự tạo thêm phục vụ xử lý dto

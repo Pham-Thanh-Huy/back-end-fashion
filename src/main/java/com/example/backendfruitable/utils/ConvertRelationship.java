@@ -71,6 +71,7 @@ public class ConvertRelationship {
 
     public Product convertToProduct(ProductDTO productDTO){
         Product product = new Product();
+        product.setProductId(productDTO.getProductId());
         product.setProductName(productDTO.getProductName());
         product.setProductCode(productDTO.getProductCode());
         product.setListedPrice(productDTO.getListedPrice());

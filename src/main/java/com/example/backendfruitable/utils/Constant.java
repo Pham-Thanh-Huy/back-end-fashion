@@ -114,12 +114,31 @@ public class Constant {
     //constant với order
     public static final String ERROR_TO_ADD_ORDER = "Gặp lỗi trong quá trình thêm đơn hàng: ";
     public static final String ERROR_TO_GET_ORDER = "Gặp lỗi trong quá trình lấy đơn hàng: ";
+    public static final String ERROR_TO_UPDATE_ORDER_STATUS = "Lỗi khi cập nhật trạng thái của đơn hàng: ";
     public static final String EMPTY_ALL_ORDER = "Không tồn tại đơn hàng nào";
+    public static final String EMPTY_ORDER_BY_ID = "Không tồn tại đơn hàng với id là: ";
+    public static final String STATUS_ORDER_REQUIRED = "Trạng thái đơn hàng không được để trống";
 
     //Constant với orderDetail
     public static final String QUANTITY_ORDER_DETAIL_REQUIRED = "Trường số lượng sản phẩm trong chi tiết sản phẩm không được để trống";
     public static final String PRODUCT_ID_ORDER_DETAIL_REQUIRED = "Trường số id sản phẩm trong chi tiết sản phẩm không được để trống";
     public static final String ORDER_DETAIL_REQUIRED = "Chi tiết sản phẩm không được để trống";
+
+    //Constant với status của order;
+    public static final String ORDER_PROCESSING = "Đang xử lý";
+    public static final String ORDER_CONFIRMED = "Đã xác nhận";
+    public static final String ORDER_DELIVERING = "Đang giao hàng";
+    public static final String ORDER_COMPLETED = "Đơn hàng thành công";
+    public static final String ORDER_CANCELLED = "Đơn hàng bị huỷ";
+    public static final String ERROR_INPUT_ORDER_STATUS = createErrorInputOrderStatusMessage();
+    private static String createErrorInputOrderStatusMessage() {
+        return "Vui lòng nhập đúng trạng thái đơn hàng đúng với một trong các từ sau: " +
+                ORDER_PROCESSING + ", " +
+                ORDER_CONFIRMED + ", " +
+                ORDER_DELIVERING + ", " +
+                ORDER_COMPLETED + ", " +
+                ORDER_CANCELLED;
+    }
 
     // Các constant với các trạng thái code của HTTP STATUS
     public static final int INTERNAL_SERVER_ERROR_CODE = 500;

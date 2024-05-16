@@ -21,6 +21,9 @@ public class Order {
     @Column(name = "note", columnDefinition = "TEXT", nullable = true)
     private String note;
 
+    @Column(name = "status")
+    private String status;
+
     @Column(name = "created_at")
     private LocalDate createdAt;
 
