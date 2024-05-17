@@ -108,7 +108,7 @@ public class UserService {
         BaseResponse<Page<UserDTO>> baseResponse = new BaseResponse<>();
         List<UserDTO> userDTOList = new ArrayList<>();
         try {
-            Page<User> userPage = userRepository.getUserByAuthorizeName(pageable, authorizeName);
+            Page<User> userPage = userRepository.getUserByAuthorizeName(authorizeName, pageable);
             if (userPage == null || userPage.isEmpty()) {
                 baseResponse.setData(null);
                 baseResponse.setMessage(Constant.EMPTY_LIST_USER_BY_AUTHORIZE_NAME + authorizeName);

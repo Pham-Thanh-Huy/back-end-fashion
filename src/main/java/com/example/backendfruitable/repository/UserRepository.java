@@ -21,6 +21,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.username = :username")
     public User getUserByUsername(@Param("username") String username);
 
-    @Query("SELECT u FROM User u JOIN u.authorizeList a WHERE a.authorizeName = :authorizeName")
-    Page<User> getUserByAuthorizeName(Pageable pageable, @Param("authorizeName") String authorizeName);
+    @Query("SELECT DISTINCT  u FROM User u JOIN u.authorizeList a WHERE a.authorizeName = :authorizeName")
+    Page<User> getUserByAuthorizeName(@Param("authorizeName") String authorizeName, Pageable pageable);
+
 }
