@@ -53,6 +53,7 @@ public class OrderService {
                 orderDTO.setAddress(order.getAddress());
                 orderDTO.setStatus(order.getStatus());
                 orderDTO.setNote(order.getNote());
+                orderDTO.setUser(convertRelationship.convertToUserDTO(order.getUser()));
                 orderDTO.setCreatedAt(order.getCreatedAt());
                 orderDTO.setDeliveryMethod(convertRelationship.convertToDeliveryMethodDTO(order.getDeliveryMethod()));
                 orderDTO.setPaymentMethod(convertRelationship.convertToPaymentMethodDTO(order.getPaymentMethod()));
@@ -98,7 +99,9 @@ public class OrderService {
             orderDTO.setAddress(order.getAddress());
             orderDTO.setStatus(order.getStatus());
             orderDTO.setNote(order.getNote());
+            orderDTO.setUser(convertRelationship.convertToUserDTO(order.getUser()));
             orderDTO.setCreatedAt(order.getCreatedAt());
+
             orderDTO.setDeliveryMethod(convertRelationship.convertToDeliveryMethodDTO(order.getDeliveryMethod()));
             orderDTO.setPaymentMethod(convertRelationship.convertToPaymentMethodDTO(order.getPaymentMethod()));
 
