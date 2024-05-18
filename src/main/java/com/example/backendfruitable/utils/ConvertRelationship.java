@@ -44,6 +44,7 @@ public class ConvertRelationship {
         userDTO.setAge(user.getAge());
         userDTO.setEmail(user.getEmail());
         userDTO.setAddress(user.getAddress());
+        userDTO.setPhoneNumber(user.getPhoneNumber());
      // lấy ảnh từ minio
       try{
           String object = user.getUserImage();
