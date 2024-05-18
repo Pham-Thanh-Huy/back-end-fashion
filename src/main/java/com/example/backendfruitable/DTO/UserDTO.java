@@ -11,6 +11,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank; // Thay thế @NotNull bằng @NotBlank
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -43,6 +44,10 @@ public class UserDTO {
     @NotBlank(message = "Email không được để trống")
     @Email(message = "Email không hợp lệ")
     private String email;
+
+    @NotBlank(message = "Số điện thoại không được để trống")
+    @Pattern(regexp = "^08[0-9]{8,9}$", message = "Số điện thoại phải đúng định dạng việt nam bắt đầu từ 2 số 08 và có độ dài từ 10-11 số")
+    private String phoneNumber;
 
     private String userImage;
 

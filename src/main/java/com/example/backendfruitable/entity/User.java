@@ -40,6 +40,9 @@ public class User {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "phone_number", nullable = false, length = 15)
+    private String phoneNumber;
+
     @Column(name = "user_image", columnDefinition = "LONGTEXT")
     @Lob
     private String userImage;

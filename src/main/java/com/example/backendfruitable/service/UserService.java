@@ -66,7 +66,7 @@ public class UserService {
         List<UserDTO> userDTOList = new ArrayList<>();
         try {
             List<User> userList = userRepository.findAll();
-            if (userList == null) {
+            if (userList.isEmpty()){
                 baseResponse.setData(null);
                 baseResponse.setMessage(Constant.EMPTY_ALL_USER);
                 baseResponse.setCode(Constant.NOT_FOUND_CODE);
@@ -81,6 +81,7 @@ public class UserService {
                 userDTO.setLastName(user.getLastname());
                 userDTO.setAge(user.getAge());
                 userDTO.setAddress(user.getAddress());
+                userDTO.setPhoneNumber(user.getPhoneNumber());
                 // Xử lý lấy phần ảnh
                 String objectName = user.getUserImage();
                 String imageUrl = minioClient.getPresignedObjectUrl(
@@ -124,6 +125,7 @@ public class UserService {
                 userDTO.setLastName(user.getLastname());
                 userDTO.setAge(user.getAge());
                 userDTO.setAddress(user.getAddress());
+                userDTO.setPhoneNumber(user.getPhoneNumber());
                 // Xử lý lấy phần ảnh
                 String objectName = user.getUserImage();
                 String imageUrl = minioClient.getPresignedObjectUrl(
@@ -169,6 +171,7 @@ public class UserService {
             userDTO.setLastName(user.getLastname());
             userDTO.setAge(user.getAge());
             userDTO.setAddress(user.getAddress());
+            userDTO.setPhoneNumber(user.getPhoneNumber());
             userDTO.setSex(user.getSex());
             userDTO.setIsActive(user.getIsActive());
             userDTO.setAuthorizeList(convertRelationship.converToAuthorizeDTOList(user.getAuthorizeList()));
@@ -213,6 +216,7 @@ public class UserService {
             userDTO.setLastName(user.getLastname());
             userDTO.setAge(user.getAge());
             userDTO.setAddress(user.getAddress());
+            userDTO.setPhoneNumber(user.getPhoneNumber());
             userDTO.setSex(user.getSex());
             userDTO.setIsActive(user.getIsActive());
             userDTO.setAuthorizeList(convertRelationship.converToAuthorizeDTOList(user.getAuthorizeList()));
@@ -278,6 +282,7 @@ public class UserService {
             user.setAge(userDTO.getAge());
             user.setAddress(userDTO.getAddress());
             user.setSex(userDTO.getSex());
+            user.setPhoneNumber(userDTO.getPhoneNumber());
             String randomTokenActive = codeActive();
             user.setToken_active(randomTokenActive);
             user.setIsActive(true);
@@ -357,6 +362,7 @@ public class UserService {
             user.setAge(userDTO.getAge());
             user.setAddress(userDTO.getAddress());
             user.setSex(userDTO.getSex());
+            user.setPhoneNumber(userDTO.getPhoneNumber());
             String randomTokenActive = codeActive();
             user.setToken_active(randomTokenActive);
             user.setIsActive(false);
@@ -449,6 +455,7 @@ public class UserService {
             user.setLastname(userDTO.getLastName());
             user.setAge(userDTO.getAge());
             user.setAddress(userDTO.getAddress());
+            user.setPhoneNumber(userDTO.getPhoneNumber());
             //update Hình ảnh nếu có update không thì sẽ không update
             if(userDTO.getDataImage() != null && userDTO.getDataImage().length > 0){
                 byte[] newImage = Base64.getDecoder().decode(Base64.getEncoder().encode(userDTO.getDataImage()));
