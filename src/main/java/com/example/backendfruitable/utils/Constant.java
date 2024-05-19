@@ -118,6 +118,7 @@ public class Constant {
     public static final String EMPTY_ALL_ORDER = "Không tồn tại đơn hàng nào";
     public static final String EMPTY_ORDER_BY_ID = "Không tồn tại đơn hàng với id là: ";
     public static final String STATUS_ORDER_REQUIRED = "Trạng thái đơn hàng không được để trống";
+    public static final String EMPTY_ORDER_BY_STATUS = "Không tồn tại đơn hàng với trạng thái: ";
 
     //Constant với orderDetail
     public static final String QUANTITY_ORDER_DETAIL_REQUIRED = "Trường số lượng sản phẩm trong chi tiết sản phẩm không được để trống";

@@ -23,7 +23,10 @@ public class SecurityEndpoints {
             "/api/user/get/*",
             "/api/user/get/by/authorize-name",
             "/api/authorize/get/*",
-            "/api/order/get/all/pagination"
+            "/api/order/get/all/pagination",
+            "/api/order/get/by/status",
+            "/api/order/get/totalprice/by/status",
+            "/api/order/get/totalprice/expected"
     };
 
     public static final String[] PUBLIC_POST_ENDPOINTS = {

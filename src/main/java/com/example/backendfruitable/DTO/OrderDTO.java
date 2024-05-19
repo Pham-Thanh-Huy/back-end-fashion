@@ -20,7 +20,11 @@ public class OrderDTO {
     private LocalDate createdAt;
 
     // các trường tự tạo thêm phục vụ xử lý dto
+    //đây là trường tổng tiền cho mỗi đơn hàng hiện tại
     private Double totalPrice;
+
+    // đây là trường tính tổng tiền cho toàn bộ tất cả đơn hàng trong hệ thống;
+    private Double grandTotalPrice;
 
 
     // các relation ship

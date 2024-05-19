@@ -4,6 +4,7 @@ import com.example.backendfruitable.DTO.BaseResponse;
 import com.example.backendfruitable.DTO.OrderDTO;
 import com.example.backendfruitable.service.OrderService;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,23 @@ public class OrderController {
     @GetMapping("/get/{orderId}")
     public ResponseEntity<BaseResponse<OrderDTO>> getOrderById(@PathVariable("orderId") Long orderId){
         BaseResponse<OrderDTO> baseResponse = orderService.getOrderById(orderId);
+        return new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
+    }
+
+    @GetMapping("/get/totalprice/expected")
+    public ResponseEntity<BaseResponse<ObjectNode>> getTotalPriceOrderExpected(){
+        BaseResponse<ObjectNode> baseResponse = orderService.getTotalPriceOrderAndQuantityExpected();
+        return new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
+    }
+    @GetMapping("/get/totalprice/by/status")
+    public ResponseEntity<BaseResponse<ObjectNode>> getTotalPriceOrder(@RequestParam String status){
+        BaseResponse<ObjectNode> baseResponse = orderService.getTotalPriceAndQuantityOrderByStatus(status);
+        return new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
+    }
+    @GetMapping("/get/by/status")
+    public ResponseEntity<BaseResponse<Page<OrderDTO>>> getOrderByStatus(@RequestParam String status,
+                                                                         Pageable pageable){
+        BaseResponse<Page<OrderDTO>> baseResponse = orderService.getOrderByStatus(status, pageable);
         return new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
     }
 

@@ -9,7 +9,8 @@ import com.example.backendfruitable.repository.*;
 import com.example.backendfruitable.utils.Constant;
 import com.example.backendfruitable.utils.ConvertRelationship;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.tomcat.util.bcel.Const;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,7 +26,7 @@ public class OrderService {
     @Autowired
     private OrderRepository orderRepository;
     @Autowired
-    private OrderDetailRepository  orderDetailRepository;
+    private OrderDetailRepository orderDetailRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -39,15 +40,184 @@ public class OrderService {
 
     public BaseResponse<Page<OrderDTO>> getAllOrders(Pageable pageable) {
         BaseResponse<Page<OrderDTO>> baseResponse = new BaseResponse<>();
-        try{
+        try {
             Page<Order> orderPage = orderRepository.findAll(pageable);
-            if(orderPage == null || orderPage.isEmpty()){
+            if (orderPage.isEmpty()) {
                 baseResponse.setMessage(Constant.EMPTY_ALL_ORDER);
                 baseResponse.setCode(Constant.NOT_FOUND_CODE);
-                return  baseResponse;
+                return baseResponse;
             }
             List<OrderDTO> orderDTOList = new ArrayList<>();
-            for(Order order : orderPage){
+            for (Order order : orderPage) {
+                OrderDTO orderDTO = new OrderDTO();
+                orderDTO.setOrderId(order.getOrderId());
+                orderDTO.setAddress(order.getAddress());
+                orderDTO.setStatus(order.getStatus());
+                orderDTO.setNote(order.getNote());
+                orderDTO.setUser(convertRelationship.convertToUserDTO(order.getUser()));
+                orderDTO.setCreatedAt(order.getCreatedAt());
+                orderDTO.setDeliveryMethod(convertRelationship.convertToDeliveryMethodDTO(order.getDeliveryMethod()));
+                orderDTO.setPaymentMethod(convertRelationship.convertToPaymentMethodDTO(order.getPaymentMethod()));
+                Double totalPrice = order.getDeliveryMethod().getDeliveryCost() + order.getPaymentMethod().getPaymentCost();
+                List<OrderDetailDTO> orderDetailDTOList = new ArrayList<>();
+                for (OrderDetail orderDetail : order.getOrderDetailList()) {
+                    OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
+                    orderDetailDTO.setOrderDetailId(orderDetail.getOrderDetailId());
+                    orderDetailDTO.setQuantity(orderDetail.getQuantity());
+                    orderDetailDTO.setTotalPrice(orderDetail.getTotalPrice());
+                    orderDetailDTO.setProduct(convertRelationship.convertToProductDTO(orderDetail.getProduct()));
+                    //tính tổng tiền mỗi lần lặp đơn hàng
+                    totalPrice = totalPrice + orderDetail.getTotalPrice();
+                    orderDetailDTOList.add(orderDetailDTO);
+                }
+                orderDTO.setOrderDetailList(orderDetailDTOList);
+                orderDTO.setTotalPrice(totalPrice);
+                orderDTOList.add(orderDTO);
+            }
+
+
+            Page<OrderDTO> orderDTOPage = new PageImpl<>(orderDTOList, pageable, orderPage.getTotalElements());
+            baseResponse.setData(orderDTOPage);
+            baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
+            baseResponse.setCode(Constant.SUCCESS_CODE);
+        } catch (Exception e) {
+            baseResponse.setMessage(Constant.ERROR_TO_GET_ORDER + e.getMessage());
+            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+        }
+        return baseResponse;
+    }
+
+    public BaseResponse<OrderDTO> getOrderById(Long orderId) {
+        BaseResponse<OrderDTO> baseResponse = new BaseResponse<>();
+        try {
+            Order order = orderRepository.getOrderByOrderId(orderId);
+            if (order == null) {
+                baseResponse.setMessage(Constant.EMPTY_ORDER_BY_ID + orderId);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
+            }
+            OrderDTO orderDTO = new OrderDTO();
+            orderDTO.setOrderId(order.getOrderId());
+            orderDTO.setAddress(order.getAddress());
+            orderDTO.setStatus(order.getStatus());
+            orderDTO.setNote(order.getNote());
+            orderDTO.setUser(convertRelationship.convertToUserDTO(order.getUser()));
+            orderDTO.setCreatedAt(order.getCreatedAt());
+
+            orderDTO.setDeliveryMethod(convertRelationship.convertToDeliveryMethodDTO(order.getDeliveryMethod()));
+            orderDTO.setPaymentMethod(convertRelationship.convertToPaymentMethodDTO(order.getPaymentMethod()));
+
+            Double totalPrice = order.getDeliveryMethod().getDeliveryCost() + order.getPaymentMethod().getPaymentCost();
+            List<OrderDetailDTO> orderDetailDTOList = new ArrayList<>();
+            for (OrderDetail orderDetail : order.getOrderDetailList()) {
+                OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
+                orderDetailDTO.setOrderDetailId(orderDetail.getOrderDetailId());
+                orderDetailDTO.setQuantity(orderDetail.getQuantity());
+                orderDetailDTO.setTotalPrice(orderDetail.getTotalPrice());
+                orderDetailDTO.setProduct(convertRelationship.convertToProductDTO(orderDetail.getProduct()));
+                //tính tổng tiền mỗi lần lặp đơn hàng
+                totalPrice = totalPrice + orderDetail.getTotalPrice();
+                orderDetailDTOList.add(orderDetailDTO);
+            }
+            orderDTO.setOrderDetailList(orderDetailDTOList);
+            orderDTO.setTotalPrice(totalPrice);
+
+            baseResponse.setData(orderDTO);
+            baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
+            baseResponse.setCode(Constant.SUCCESS_CODE);
+        } catch (Exception e) {
+            baseResponse.setMessage(Constant.ERROR_TO_GET_ORDER + e.getMessage());
+            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+        }
+        return baseResponse;
+    }
+
+    // lấy và tính toàn bộ tiền trong đơn hàng (vì là tính tiền đơn hàng dự tính nên lấy cả những đơn đang xử lý vv... , trừ đơn hàng bị huỷ)
+    public BaseResponse<ObjectNode> getTotalPriceOrderAndQuantityExpected() {
+        BaseResponse<ObjectNode> baseResponse = new BaseResponse<>();
+        try {
+            List<Order> orderPage = orderRepository.getOrderByStatusNot(Constant.ORDER_CANCELLED);
+            if (orderPage.isEmpty()) {
+                baseResponse.setMessage(Constant.EMPTY_ALL_ORDER);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
+            }
+            Double grandTotalPrice = 0.0;
+            int totalOrder = orderPage.size();
+            for (Order order : orderPage) {
+                OrderDTO orderDTO = new OrderDTO();
+                Double totalPrice = order.getDeliveryMethod().getDeliveryCost() + order.getPaymentMethod().getPaymentCost();
+                List<OrderDetailDTO> orderDetailDTOList = new ArrayList<>();
+                for (OrderDetail orderDetail : order.getOrderDetailList()) {
+                    totalPrice = totalPrice + orderDetail.getTotalPrice();
+                }
+
+                if (!order.getStatus().equals(Constant.ORDER_CANCELLED)) {
+                    grandTotalPrice = grandTotalPrice + totalPrice; // Cập nhật tổng giá trị tất cả các đơn hàng không bị huỷ
+                }
+            }
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode objectNode = objectMapper.createObjectNode();
+            objectNode.put("grandTotalPrice", grandTotalPrice);
+            objectNode.put("totalOrder", totalOrder);
+            baseResponse.setData(objectNode);
+            baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
+            baseResponse.setCode(Constant.SUCCESS_CODE);
+        } catch (Exception e) {
+            baseResponse.setMessage(Constant.ERROR_TO_GET_ORDER + e.getMessage());
+            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+        }
+        return baseResponse;
+    }
+
+    // lấy và tính tổng tiền với tổng số lượng theo status
+    public BaseResponse<ObjectNode> getTotalPriceAndQuantityOrderByStatus(String status) {
+        BaseResponse<ObjectNode> baseResponse = new BaseResponse<>();
+        try {
+            List<Order> orderPage = orderRepository.getOrderByStatus(status);
+            if (orderPage.isEmpty()) {
+                baseResponse.setMessage(Constant.EMPTY_ORDER_BY_STATUS + status);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
+            }
+            Double grandTotalPrice = 0.0;
+            int totalOrder = orderPage.size();
+            for (Order order : orderPage) {
+                OrderDTO orderDTO = new OrderDTO();
+                Double totalPrice = order.getDeliveryMethod().getDeliveryCost() + order.getPaymentMethod().getPaymentCost();
+                List<OrderDetailDTO> orderDetailDTOList = new ArrayList<>();
+                for (OrderDetail orderDetail : order.getOrderDetailList()) {
+                    totalPrice = totalPrice + orderDetail.getTotalPrice();
+                }
+                    grandTotalPrice = grandTotalPrice + totalPrice; // Cập nhật tổng giá trị tất cả các đơn hàng không bị huỷ
+            }
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode objectNode = objectMapper.createObjectNode();
+            objectNode.put("grandTotalPrice", grandTotalPrice);
+            objectNode.put("totalOrder", totalOrder);
+            baseResponse.setData(objectNode);
+            baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
+            baseResponse.setCode(Constant.SUCCESS_CODE);
+        } catch (Exception e) {
+            baseResponse.setMessage(Constant.ERROR_TO_GET_ORDER + e.getMessage());
+            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+        }
+        return baseResponse;
+    }
+    // lấy theo trạng thái đơn hàng
+    public BaseResponse<Page<OrderDTO>> getOrderByStatus(String status, Pageable pageable) {
+        BaseResponse<Page<OrderDTO>> baseResponse = new BaseResponse<>();
+        try {
+            Page<Order> orderPage = orderRepository.getOrderByStatus(status, pageable);
+            if (orderPage.isEmpty()) {
+                baseResponse.setMessage(Constant.EMPTY_ORDER_BY_STATUS + status);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
+            }
+            List<OrderDTO> orderDTOList = new ArrayList<>();
+            for (Order order : orderPage) {
                 OrderDTO orderDTO = new OrderDTO();
                 orderDTO.setOrderId(order.getOrderId());
                 orderDTO.setAddress(order.getAddress());
@@ -60,7 +230,7 @@ public class OrderService {
 
                 Double totalPrice = order.getDeliveryMethod().getDeliveryCost() + order.getPaymentMethod().getPaymentCost();
                 List<OrderDetailDTO> orderDetailDTOList = new ArrayList<>();
-                for(OrderDetail orderDetail : order.getOrderDetailList()){
+                for (OrderDetail orderDetail : order.getOrderDetailList()) {
                     OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
                     orderDetailDTO.setOrderDetailId(orderDetail.getOrderDetailId());
                     orderDetailDTO.setQuantity(orderDetail.getQuantity());
@@ -78,52 +248,7 @@ public class OrderService {
             baseResponse.setData(orderDTOPage);
             baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
             baseResponse.setCode(Constant.SUCCESS_CODE);
-        }catch (Exception e){
-            baseResponse.setMessage(Constant.ERROR_TO_GET_ORDER + e.getMessage());
-            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
-        }
-        return baseResponse;
-    }
-
-    public BaseResponse<OrderDTO> getOrderById(Long orderId){
-        BaseResponse<OrderDTO> baseResponse = new BaseResponse<>();
-        try{
-                Order order = orderRepository.getOrderByOrderId(orderId);
-                if(order == null){
-                    baseResponse.setMessage(Constant.EMPTY_ORDER_BY_ID + orderId);
-                    baseResponse.setCode(Constant.NOT_FOUND_CODE);
-                    return baseResponse;
-                }
-            OrderDTO orderDTO = new OrderDTO();
-            orderDTO.setOrderId(order.getOrderId());
-            orderDTO.setAddress(order.getAddress());
-            orderDTO.setStatus(order.getStatus());
-            orderDTO.setNote(order.getNote());
-            orderDTO.setUser(convertRelationship.convertToUserDTO(order.getUser()));
-            orderDTO.setCreatedAt(order.getCreatedAt());
-
-            orderDTO.setDeliveryMethod(convertRelationship.convertToDeliveryMethodDTO(order.getDeliveryMethod()));
-            orderDTO.setPaymentMethod(convertRelationship.convertToPaymentMethodDTO(order.getPaymentMethod()));
-
-            Double totalPrice = order.getDeliveryMethod().getDeliveryCost() + order.getPaymentMethod().getPaymentCost();
-            List<OrderDetailDTO> orderDetailDTOList = new ArrayList<>();
-            for(OrderDetail orderDetail : order.getOrderDetailList()){
-                OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
-                orderDetailDTO.setOrderDetailId(orderDetail.getOrderDetailId());
-                orderDetailDTO.setQuantity(orderDetail.getQuantity());
-                orderDetailDTO.setTotalPrice(orderDetail.getTotalPrice());
-                orderDetailDTO.setProduct(convertRelationship.convertToProductDTO(orderDetail.getProduct()));
-                //tính tổng tiền mỗi lần lặp đơn hàng
-                totalPrice = totalPrice + orderDetail.getTotalPrice();
-                orderDetailDTOList.add(orderDetailDTO);
-            }
-            orderDTO.setOrderDetailList(orderDetailDTOList);
-            orderDTO.setTotalPrice(totalPrice);
-
-            baseResponse.setData(orderDTO);
-            baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
-            baseResponse.setCode(Constant.SUCCESS_CODE);
-        }catch (Exception e){
+        } catch (Exception e) {
             baseResponse.setMessage(Constant.ERROR_TO_GET_ORDER + e.getMessage());
             baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
         }
@@ -131,27 +256,27 @@ public class OrderService {
     }
 
 
-    public BaseResponse<OrderDTO> createOrder(Long userId, OrderDTO orderDTO){
+    public BaseResponse<OrderDTO> createOrder(Long userId, OrderDTO orderDTO) {
         BaseResponse<OrderDTO> baseResponse = new BaseResponse<>();
-        try{
+        try {
             Order order = new Order();
-           List<OrderDetail> orderDetailList = new ArrayList<>();
+            List<OrderDetail> orderDetailList = new ArrayList<>();
             User user = userRepository.getUserById(userId);
-            if(user == null){
+            if (user == null) {
                 baseResponse.setMessage(Constant.EMPTY_USER_BY_ID);
                 baseResponse.setCode(Constant.NOT_FOUND_CODE);
                 return baseResponse;
             }
             // lấy phương thức thanh toán và phương thức vận chuyển rồi kiểm tra
-            if(orderDTO.getDeliveryMethod() == null ||orderDTO.getDeliveryMethod().getDeliveryId() == null ||
-                    orderDTO.getDeliveryMethod().getDeliveryId().describeConstable().isEmpty()){
+            if (orderDTO.getDeliveryMethod() == null || orderDTO.getDeliveryMethod().getDeliveryId() == null ||
+                    orderDTO.getDeliveryMethod().getDeliveryId().describeConstable().isEmpty()) {
                 baseResponse.setMessage(Constant.DELIVERY_METHOD_ID_REQUIRED);
                 baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                 return baseResponse;
             }
 
-            if(orderDTO.getPaymentMethod() == null || orderDTO.getPaymentMethod().getPaymentId() == null ||
-                    orderDTO.getPaymentMethod().getPaymentId().describeConstable().isEmpty()){
+            if (orderDTO.getPaymentMethod() == null || orderDTO.getPaymentMethod().getPaymentId() == null ||
+                    orderDTO.getPaymentMethod().getPaymentId().describeConstable().isEmpty()) {
                 baseResponse.setMessage(Constant.PAYMENT_METHOD_ID_REQUIRED);
                 baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                 return baseResponse;
@@ -160,12 +285,12 @@ public class OrderService {
             Long paymentId = orderDTO.getPaymentMethod().getPaymentId();
             DeliveryMethod deliveryMethod = deliveryMethodRepository.findDeliveryMethodByDeliveryId(deliveryId);
             PaymentMethod paymentMethod = paymentMethodRepository.findPaymentMethodById(paymentId);
-            if(deliveryMethod == null){
+            if (deliveryMethod == null) {
                 baseResponse.setMessage(Constant.EMPTY_DELIVERY_METHOD_BY_ID + deliveryId);
                 baseResponse.setCode(Constant.NOT_FOUND_CODE);
                 return baseResponse;
             }
-            if(paymentMethod == null){
+            if (paymentMethod == null) {
                 baseResponse.setMessage(Constant.EMPTY_PAYMENT_METHOD_BY_ID + paymentId);
                 baseResponse.setCode(Constant.NOT_FOUND_CODE);
                 return baseResponse;
@@ -175,42 +300,42 @@ public class OrderService {
             order.setAddress(orderDTO.getAddress());
             order.setDeliveryMethod(deliveryMethod);
             order.setPaymentMethod(paymentMethod);
-            if(orderDTO.getNote() != null){
+            if (orderDTO.getNote() != null) {
                 order.setNote(orderDTO.getNote());
             }
             order.setStatus(Constant.ORDER_PROCESSING);
             order.setUser(user);
             order.setCreatedAt(LocalDate.now());
 
-            if(orderDTO.getOrderDetailList()== null || orderDTO.getOrderDetailList().isEmpty()){
+            if (orderDTO.getOrderDetailList() == null || orderDTO.getOrderDetailList().isEmpty()) {
                 baseResponse.setMessage(Constant.ORDER_DETAIL_REQUIRED);
                 baseResponse.setCode(Constant.BAD_REQUEST_CODE);
-                return  baseResponse;
+                return baseResponse;
             }
 
             // tiếp tục check các sản phẩm trong orderDetails
             List<OrderDetailDTO> orderDetailDTOList = new ArrayList<>();
-            for(OrderDetailDTO orderDetailDTO : orderDTO.getOrderDetailList()){
+            for (OrderDetailDTO orderDetailDTO : orderDTO.getOrderDetailList()) {
                 OrderDetail orderDetail = new OrderDetail();
                 OrderDetailDTO orderDetailDTOConvertResponse = new OrderDetailDTO();
-                if(orderDetailDTO.getQuantity() == null){
+                if (orderDetailDTO.getQuantity() == null) {
                     baseResponse.setMessage(Constant.QUANTITY_ORDER_DETAIL_REQUIRED);
                     baseResponse.setCode(Constant.BAD_REQUEST_CODE);
-                    return  baseResponse;
+                    return baseResponse;
                 }
 
                 // tiếp tục check productId;
-                if( orderDetailDTO.getProduct() == null || orderDetailDTO.getProduct().getProductId() == null){
+                if (orderDetailDTO.getProduct() == null || orderDetailDTO.getProduct().getProductId() == null) {
                     baseResponse.setMessage(Constant.PRODUCT_ID_ORDER_DETAIL_REQUIRED);
                     baseResponse.setCode(Constant.BAD_REQUEST_CODE);
-                    return  baseResponse;
+                    return baseResponse;
                 }
                 Long productId = orderDetailDTO.getProduct().getProductId();
                 Product product = productRepository.getProductById(productId);
-                if(product == null){
+                if (product == null) {
                     baseResponse.setMessage(Constant.EMPTY_PRODUCT_BY_ID + productId);
                     baseResponse.setCode(Constant.NOT_FOUND_CODE);
-                    return  baseResponse;
+                    return baseResponse;
                 }
                 //tính tổng giá tiền
                 Double totalPrice = orderDetailDTO.getQuantity().doubleValue() * product.getProductPrice();
@@ -232,7 +357,7 @@ public class OrderService {
             orderDetailRepository.saveAll(orderDetailList);
 
             // tiếp tục convert vài dto để trả ra cho người dùng xem
-            UserDTO  userDTO = convertRelationship.convertToUserDTO(user);
+            UserDTO userDTO = convertRelationship.convertToUserDTO(user);
             orderDTO.setUser(userDTO);
             orderDTO.setDeliveryMethod(convertRelationship.convertToDeliveryMethodDTO(deliveryMethod));
             orderDTO.setPaymentMethod(convertRelationship.convertToPaymentMethodDTO(paymentMethod));
@@ -242,7 +367,7 @@ public class OrderService {
             baseResponse.setMessage(Constant.SUCCESS_ADD_MESSAGE);
             baseResponse.setCode(Constant.SUCCESS_CODE);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             baseResponse.setMessage(Constant.ERROR_TO_ADD_ORDER + e.getMessage());
             baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
         }
@@ -250,11 +375,11 @@ public class OrderService {
     }
 
 
-    public BaseResponse<OrderDTO> updateStatus(Long orderId, JsonNode jsonNode){
+    public BaseResponse<OrderDTO> updateStatus(Long orderId, JsonNode jsonNode) {
         BaseResponse<OrderDTO> baseResponse = new BaseResponse<>();
-        try{
+        try {
             Order order = orderRepository.getOrderByOrderId(orderId);
-            if(order == null){
+            if (order == null) {
                 baseResponse.setMessage(Constant.EMPTY_ORDER_BY_ID + orderId);
                 baseResponse.setCode(Constant.NOT_FOUND_CODE);
                 return baseResponse;
@@ -301,7 +426,7 @@ public class OrderService {
             baseResponse.setData(orderDTO);
             baseResponse.setMessage(Constant.SUCCESS_UPDATE_MESSAGE);
             baseResponse.setCode(Constant.SUCCESS_CODE);
-        }catch (Exception e){
+        } catch (Exception e) {
             baseResponse.setMessage(Constant.ERROR_TO_UPDATE_ORDER_STATUS + e.getMessage());
             baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
         }
