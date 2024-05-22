@@ -600,12 +600,14 @@ public class ProductService {
 
             }
            List<Inventory> inventoryAddList =  inventoryRepository.saveAll(inventoryList);
-            List<InventoryDTO> inventoryDTO = new ArrayList<>();
+            List<InventoryDTO> inventoryDTOList =  convertRelationship.convertToInventoryDTOList(inventoryAddList);
+
+
 
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectNode objectNode = objectMapper.createObjectNode();
             objectNode.put("productName", product.getProductName());
-            objectNode.putPOJO("inventoryList",  inventoryAddList);
+            objectNode.putPOJO("inventoryList",  inventoryDTOList);
 
             baseResponse.setData(objectNode);
             baseResponse.setMessage(Constant.SUCCESS_UPDATE_MESSAGE);

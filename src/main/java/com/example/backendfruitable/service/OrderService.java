@@ -11,6 +11,7 @@ import com.example.backendfruitable.utils.ConvertRelationship;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -37,6 +38,12 @@ public class OrderService {
     private ProductRepository productRepository;
     @Autowired
     private ConvertRelationship convertRelationship;
+    @Autowired
+    private ProductColorRepository productColorRepository;
+    @Autowired
+    private ProductSizeRepository productSizeRepository;
+    @Autowired
+    private InventoryRepository inventoryRepository;
 
     public BaseResponse<Page<OrderDTO>> getAllOrders(Pageable pageable) {
         BaseResponse<Page<OrderDTO>> baseResponse = new BaseResponse<>();
@@ -316,6 +323,8 @@ public class OrderService {
 
             // tiếp tục check các sản phẩm trong orderDetails
             List<OrderDetailDTO> orderDetailDTOList = new ArrayList<>();
+            // Lưu những sản phẩm sẽ được cập nhật hàng tồn kho
+            List<Inventory> inventoryListUpdate = new ArrayList<>();
             for (OrderDetailDTO orderDetailDTO : orderDTO.getOrderDetailList()) {
                 OrderDetail orderDetail = new OrderDetail();
                 OrderDetailDTO orderDetailDTOConvertResponse = new OrderDetailDTO();
@@ -333,18 +342,67 @@ public class OrderService {
                 }
                 Long productId = orderDetailDTO.getProduct().getProductId();
                 Product product = productRepository.getProductById(productId);
+                Integer productSizeId = orderDetailDTO.getProductSize().getProductSizeId();
+                Integer productColorId = orderDetailDTO.getProductColor().getProductColorId();
+
                 if (product == null) {
                     baseResponse.setMessage(Constant.EMPTY_PRODUCT_BY_ID + productId);
                     baseResponse.setCode(Constant.NOT_FOUND_CODE);
                     return baseResponse;
                 }
+
+                if(productSizeId == null){
+                    baseResponse.setMessage(Constant.INVENTORY_PRODUCT_SIZE_ID_REQUIRED);
+                    baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                    return baseResponse;
+                }
+                if(productColorId == null){
+                    baseResponse.setMessage(Constant.INVENTORY_PRODUCT_COLOR_ID_REQUIRED);
+                    baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                    return baseResponse;
+                }
+
+                ProductSize productSize = productSizeRepository.findProductSizeByProductSizeId(productSizeId);
+                ProductColor productColor = productColorRepository.findProductColorByProductColorId(productColorId);
+                if (productSize == null) {
+                    baseResponse.setMessage(Constant.EMPTY_PRODUCT_SIZE_BY_ID + productSizeId);
+                    baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                    return baseResponse;
+                }
+                if (productColor == null) {
+                    baseResponse.setMessage(Constant.EMPTY_PRODUCT_COLOR_BY_ID + productColorId);
+                    baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                    return baseResponse;
+                }
+
                 //tính tổng giá tiền
                 Double totalPrice = orderDetailDTO.getQuantity().doubleValue() * product.getProductPrice();
                 orderDetail.setTotalPrice(totalPrice);
                 orderDetail.setQuantity(orderDetailDTO.getQuantity());
+                orderDetail.setProductColor(productColor);
+                orderDetail.setProductSize(productSize);
                 orderDetail.setProduct(product);
                 orderDetail.setOrder(order);
                 orderDetailList.add(orderDetail);
+
+                // sau khi mua trừ đi số lượng hàng trong tồn kho
+                 List<Inventory> inventoryList = new ArrayList<>(product.getInventoryList());
+                 Boolean checkInventory = false;
+                 for (Inventory inventory : inventoryList) {
+                     if(inventory.getProductColor().getProductColorId() == productColorId && inventory.getProductSize().getProductSizeId() == productSizeId){
+                         inventory.setQuantity(inventory.getQuantity() - orderDetailDTO.getQuantity());
+                         checkInventory = true;
+                         inventoryListUpdate.add(inventory);
+                         break;
+                     }
+                 }
+
+                 if(!checkInventory){
+                     baseResponse.setMessage(Constant.NOT_FOUND_PRODUCT_SIZE_ID_AND_PRODUCT_COLOR_ID_IN_THIS_PRODUCT_INVENTORY + productId);
+                     baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                     return baseResponse;
+                 }
+
 
                 // convert tiếp dto để tí trả ra response
                 orderDetailDTOConvertResponse.setTotalPrice(totalPrice);
@@ -356,6 +414,7 @@ public class OrderService {
 
             orderRepository.save(order);
             orderDetailRepository.saveAll(orderDetailList);
+            inventoryRepository.saveAll(inventoryListUpdate);
 
             // tiếp tục convert vài dto để trả ra cho người dùng xem
             UserDTO userDTO = convertRelationship.convertToUserDTO(user);
