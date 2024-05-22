@@ -48,6 +48,7 @@ public class SecurityEndpoints {
             "/api/post/add",
             "/api/delivery-method/add",
             "/api/payment-method/add",
+            "/api/product/add/inventory"
 
     };
 
@@ -63,7 +64,8 @@ public class SecurityEndpoints {
             "api/post/update/**",
             "/api/delivery-method/update/*",
             "/api/payment-method/update/*",
-            "/api/order/update/*"
+            "/api/order/update/*",
+            "/api/product/update/inventory/*"
     };
     public static final String[] ADMIN_PUT_ENDPOINTS = {
             "/api/user/update/**",

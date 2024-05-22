@@ -3,6 +3,8 @@ package com.example.backendfruitable.controller;
 import com.example.backendfruitable.DTO.BaseResponse;
 import com.example.backendfruitable.DTO.ProductDTO;
 import com.example.backendfruitable.service.ProductService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +55,13 @@ public class ProductController {
         return new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
     }
 
+    @PostMapping("/add/inventory")
+    public ResponseEntity<BaseResponse<ObjectNode>> addInventoryProduct(@RequestBody JsonNode jsonNode,
+                                                                        @RequestParam("productId") Long productId){
+        BaseResponse<ObjectNode> baseResponse = productService.addInventoryproduct(productId, jsonNode);
+        return new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
+    }
+
     @Operation(summary = "Sửa sản phẩm")
     @PutMapping("/update/{id}")
     public ResponseEntity<BaseResponse<ProductDTO>> updateProduct(@Valid @RequestBody ProductDTO productDTO,
@@ -60,6 +69,13 @@ public class ProductController {
                                                                   @RequestParam Long categoryProductId,
                                                                   @RequestParam Long userId) {
         BaseResponse<ProductDTO> baseResponse = productService.updateProduct(productId, productDTO, categoryProductId, userId);
+        return new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
+    }
+
+    @PutMapping("/update/inventory/{id}")
+    public ResponseEntity<BaseResponse<ObjectNode>> updateQuantityInventoryProduct(@PathVariable("id") Long productId,
+                                                                                    @RequestBody JsonNode jsonNode){
+        BaseResponse<ObjectNode> baseResponse = productService.updateQuantityInventoryProduct(productId, jsonNode);
         return new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
     }
 

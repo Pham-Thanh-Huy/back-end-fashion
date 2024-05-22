@@ -1,26 +1,36 @@
 package com.example.backendfruitable.service;
 
-import com.example.backendfruitable.DTO.*;
+import com.example.backendfruitable.DTO.BaseResponse;
+import com.example.backendfruitable.DTO.ImageDTO;
+import com.example.backendfruitable.DTO.InventoryDTO;
+import com.example.backendfruitable.DTO.ProductDTO;
 import com.example.backendfruitable.entity.*;
 import com.example.backendfruitable.repository.*;
 import com.example.backendfruitable.utils.Constant;
 import com.example.backendfruitable.utils.ConvertRelationship;
 import com.example.backendfruitable.utils.Recursive;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.http.Method;
+import io.swagger.v3.core.util.Json;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -296,7 +306,7 @@ public class ProductService {
                     return baseResponse;
                 }
 
-                if (inventoryDTO.getProductSize().getProductSizeId() == null || inventoryDTO.getProductSize().getProductSizeId() <= 0 ) {
+                if (inventoryDTO.getProductSize().getProductSizeId() == null || inventoryDTO.getProductSize().getProductSizeId() <= 0) {
                     baseResponse.setMessage(Constant.INVENTORY_PRODUCT_SIZE_ID_REQUIRED);
                     baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                     return baseResponse;
@@ -316,12 +326,12 @@ public class ProductService {
                 int productColorId = inventoryDTO.getProductColor().getProductColorId();
                 ProductSize productSize = productSizeRepository.findProductSizeByProductSizeId(productSizeId);
                 ProductColor productColor = productColorRepository.findProductColorByProductColorId(productColorId);
-                if(productSize == null){
+                if (productSize == null) {
                     baseResponse.setMessage(Constant.EMPTY_PRODUCT_SIZE_BY_ID + productSizeId);
                     baseResponse.setCode(Constant.NOT_FOUND_CODE);
                     return baseResponse;
                 }
-                if(productColor == null){
+                if (productColor == null) {
                     baseResponse.setMessage(Constant.EMPTY_PRODUCT_COLOR_BY_ID + productColorId);
                     baseResponse.setCode(Constant.NOT_FOUND_CODE);
                     return baseResponse;
@@ -335,6 +345,8 @@ public class ProductService {
                 inventory.setProductColor(productColor);
                 inventory.setProduct(product);
                 inventoryList.add(inventory);
+                // chỉ cho add 1 lần nên ta sẽ break luôn
+                break;
             }
 
 
@@ -350,6 +362,91 @@ public class ProductService {
 
         } catch (Exception e) {
             baseResponse.setMessage(Constant.ERROR_TO_ADD_PRODUCT + e.getMessage());
+            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+        }
+        return baseResponse;
+    }
+
+    public BaseResponse<ObjectNode> addInventoryproduct(Long productId, JsonNode jsonNode) {
+        BaseResponse<ObjectNode> baseResponse = new BaseResponse<>();
+        try {
+            Product product = productRepository.getProductById(productId);
+            if (product == null) {
+                baseResponse.setMessage(Constant.EMPTY_PRODUCT_BY_ID + productId);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
+            }
+            Long quantity;
+            JsonNode quantityJsonNode = jsonNode.get("quantity");
+            if (ObjectUtils.isEmpty(quantityJsonNode)) {
+                baseResponse.setMessage(Constant.INVENTORY_QUANTITY_REQUIRED);
+                baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                return baseResponse;
+            }else{
+                 quantity = quantityJsonNode.asLong();
+            }
+            Integer productSizeId;
+            Integer productColorId;
+            JsonNode productSizeIdJsonNode = jsonNode.get("productSizeId");
+            JsonNode productColorIdJsonNode = jsonNode.get("productColorId");
+            if(ObjectUtils.isEmpty(productSizeIdJsonNode)){
+                baseResponse.setMessage(Constant.INVENTORY_PRODUCT_SIZE_ID_REQUIRED);
+                baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                return baseResponse;
+            }else{
+                 productSizeId = productSizeIdJsonNode.asInt();
+            }
+
+            if(ObjectUtils.isEmpty(productColorIdJsonNode)){
+                baseResponse.setMessage(Constant.INVENTORY_PRODUCT_COLOR_ID_REQUIRED);
+                baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                return baseResponse;
+            }else{
+                 productColorId = productColorIdJsonNode.asInt();
+            }
+
+            // check xem  màu + size + số lượng sản phẩm đã tồn tại chưa nếu tồn tại rồi thì không cho thêm;
+            for (Inventory inventory : product.getInventoryList()) {
+                if (inventory.getProductColor().getProductColorId() == productColorId && inventory.getProductSize().getProductSizeId() == productSizeId){
+                    baseResponse.setMessage(Constant.PRODUCT_COLOR_ID_AND_PRODUCT_SIZE_ID_EXISTS_QUANTITY_IN_PRODUCT);
+                    baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                    return baseResponse;
+                }
+            }
+            ProductSize productSize = productSizeRepository.findProductSizeByProductSizeId(productSizeId);
+            ProductColor productColor = productColorRepository.findProductColorByProductColorId(productColorId);
+            if (productSize == null) {
+                baseResponse.setMessage(Constant.EMPTY_PRODUCT_SIZE_BY_ID + productSizeId);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
+            }
+            if (productColor == null) {
+                baseResponse.setMessage(Constant.EMPTY_PRODUCT_COLOR_BY_ID + productColorId);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
+            }
+            List<Inventory> inventoryList = new ArrayList<>(product.getInventoryList());
+            Inventory inventory = new Inventory();
+            inventory.setQuantity(quantity);
+            inventory.setProductColor(productColor);
+            inventory.setProductSize(productSize);
+            inventory.setProduct(product);
+            inventoryList.add(inventory);
+
+            inventoryRepository.saveAll(inventoryList);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode objectNode = objectMapper.createObjectNode();
+            objectNode.put("productName", product.getProductName());
+            objectNode.put("quantity", quantity);
+            objectNode.put("colorName", productColor.getColorName());
+            objectNode.put("sizeName", productSize.getSizeName());
+
+            baseResponse.setData(objectNode);
+            baseResponse.setMessage(Constant.SUCCESS_ADD_MESSAGE);
+            baseResponse.setCode(Constant.SUCCESS_CODE);
+        } catch (Exception e) {
+            baseResponse.setMessage(Constant.ERROR_TO_ADD_INVENTORY_IN_PRODUCT + e.getMessage());
             baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
         }
         return baseResponse;
@@ -444,6 +541,79 @@ public class ProductService {
             e.printStackTrace();
         }
 
+        return baseResponse;
+    }
+
+    public BaseResponse<ObjectNode> updateQuantityInventoryProduct(Long productId, JsonNode jsonNode){
+        BaseResponse<ObjectNode> baseResponse = new BaseResponse<>();
+        try{
+            Product product = productRepository.getProductById(productId);
+            if (product == null) {
+                baseResponse.setMessage(Constant.EMPTY_PRODUCT_BY_ID + productId);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
+            }
+            JsonNode inventoryListJsonNode =  jsonNode.get("inventoryList");
+            if(ObjectUtils.isEmpty(inventoryListJsonNode)){
+                baseResponse.setMessage(Constant.INVENTORY_LIST_REQUIRED);
+                baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                return baseResponse;
+            }
+            List<Inventory> inventoryList = new ArrayList<>(product.getInventoryList());
+            for(JsonNode inventoryJsonNode : inventoryListJsonNode){
+                Long quantity;
+                Integer productSizeId;
+                Integer productColorId;
+                JsonNode quantityJsonNode = inventoryJsonNode.get("quantity");
+                JsonNode productSizeIdJsonNode = inventoryJsonNode.get("productSizeId");
+                JsonNode productColorIdJsonNode = inventoryJsonNode.get("productColorId");
+                if(ObjectUtils.isEmpty(quantityJsonNode)){
+                    baseResponse.setMessage(Constant.INVENTORY_QUANTITY_REQUIRED);
+                    baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                    return baseResponse;
+                }else{
+                    quantity = quantityJsonNode.asLong();
+                }
+
+                if(ObjectUtils.isEmpty(productSizeIdJsonNode)){
+                    baseResponse.setMessage(Constant.INVENTORY_PRODUCT_SIZE_ID_REQUIRED);
+                    baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                    return baseResponse;
+                }else{
+                    productSizeId = productSizeIdJsonNode.asInt();
+                }
+
+                if(ObjectUtils.isEmpty(productColorIdJsonNode)){
+                    baseResponse.setMessage(Constant.INVENTORY_PRODUCT_COLOR_ID_REQUIRED);
+                    baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                    return baseResponse;
+                }else {
+                    productColorId = productColorIdJsonNode.asInt();
+                }
+
+                // tiếp tục kiểm tra
+                for(Inventory inventory : inventoryList){
+                    if( inventory.getProductSize().getProductSizeId() == productSizeId && inventory.getProductColor().getProductColorId() == productColorId){
+                        inventory.setQuantity(quantity);
+                    }
+                }
+
+            }
+           List<Inventory> inventoryAddList =  inventoryRepository.saveAll(inventoryList);
+            List<InventoryDTO> inventoryDTO = new ArrayList<>();
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode objectNode = objectMapper.createObjectNode();
+            objectNode.put("productName", product.getProductName());
+            objectNode.putPOJO("inventoryList",  inventoryAddList);
+
+            baseResponse.setData(objectNode);
+            baseResponse.setMessage(Constant.SUCCESS_UPDATE_MESSAGE);
+            baseResponse.setCode(Constant.SUCCESS_CODE);
+        }catch (Exception e){
+            baseResponse.setMessage(Constant.ERROR_TO_UPDATE_INVENTORY_IN_PRODUCT);
+            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+        }
         return baseResponse;
     }
 
