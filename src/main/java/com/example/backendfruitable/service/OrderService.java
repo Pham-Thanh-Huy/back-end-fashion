@@ -60,6 +60,7 @@ public class OrderService {
                 orderDTO.setPaymentMethod(convertRelationship.convertToPaymentMethodDTO(order.getPaymentMethod()));
                 Double totalPrice = order.getDeliveryMethod().getDeliveryCost() + order.getPaymentMethod().getPaymentCost();
                 List<OrderDetailDTO> orderDetailDTOList = new ArrayList<>();
+
                 for (OrderDetail orderDetail : order.getOrderDetailList()) {
                     OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
                     orderDetailDTO.setOrderDetailId(orderDetail.getOrderDetailId());

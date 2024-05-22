@@ -1,30 +1,24 @@
 package com.example.backendfruitable.DTO;
 
-
-import com.example.backendfruitable.entity.Order;
 import com.example.backendfruitable.entity.Product;
 import com.example.backendfruitable.entity.ProductColor;
 import com.example.backendfruitable.entity.ProductSize;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Data;
-
-import java.util.List;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class OrderDetailDTO {
-    private Long orderDetailId;
+public class InventoryDTO {
+    private Long inventoryId;
     private Long quantity;
-    private Double totalPrice;
 
     private ProductDTO product;
-    private OrderDTO order;
-
-
     private ProductSizeDTO productSize;
-
     private ProductColorDTO productColor;
 }

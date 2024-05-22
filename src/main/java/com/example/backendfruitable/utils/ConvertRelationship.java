@@ -30,11 +30,59 @@ public class ConvertRelationship {
         return imageDTOList;
     }
 
-    public StockDTO convertToStockDTO(Stock stock){
-        StockDTO stockDTO = new StockDTO();
-        stockDTO.setStockId(stock.getStockId());
-        stockDTO.setQuantity(stock.getQuantity());
-        return stockDTO;
+    public List<InventoryDTO> convertToInventoryDTOList(List<Inventory> inventoryList){
+      List<InventoryDTO> inventoryDTOList = new ArrayList<>();
+      for(Inventory inventory : inventoryList){
+          InventoryDTO inventoryDTO = new InventoryDTO();
+          inventoryDTO.setInventoryId(inventory.getInventoryId());
+          inventoryDTO.setQuantity(inventory.getQuantity());
+          inventoryDTO.setProductColor(convertToProductColorDTO(inventory.getProductColor()));
+          inventoryDTO.setProductSize(convertToProductSizeDTO(inventory.getProductSize()));
+          inventoryDTOList.add(inventoryDTO);
+      }
+        return inventoryDTOList;
+    }
+
+    public List<Inventory>  convertToInventoryList(List<InventoryDTO> inventoryDTOList){
+        List<Inventory> inventoryList = new ArrayList<>();
+        for(InventoryDTO inventoryDTO : inventoryDTOList){
+            Inventory inventory = new Inventory();
+            inventory.setInventoryId(inventoryDTO.getInventoryId());
+            inventory.setQuantity(inventoryDTO.getQuantity());
+            inventory.setQuantity(inventoryDTO.getQuantity());
+            inventory.setProductColor(convertToProductColor(inventoryDTO.getProductColor()));
+            inventory.setProductSize(convertToProductSize(inventoryDTO.getProductSize()));
+            inventoryList.add(inventory);
+        }
+        return inventoryList;
+    }
+
+    public ProductColorDTO convertToProductColorDTO(ProductColor productColor){
+        ProductColorDTO productColorDTO = new ProductColorDTO();
+        productColorDTO.setProductColorId(productColor.getProductColorId());
+        productColorDTO.setColorName(productColor.getColorName());
+        return productColorDTO;
+    }
+
+    public ProductSizeDTO convertToProductSizeDTO(ProductSize productSize){
+        ProductSizeDTO productSizeDTO = new ProductSizeDTO();
+        productSizeDTO.setProductSizeId(productSize.getProductSizeId());
+        productSizeDTO.setSizeName(productSize.getSizeName());
+        return productSizeDTO;
+    }
+
+    public ProductColor convertToProductColor(ProductColorDTO productColorDTO){
+        ProductColor productColor = new ProductColor();
+        productColor.setProductColorId(productColorDTO.getProductColorId());
+        productColor.setColorName(productColorDTO.getColorName());
+        return productColor;
+    }
+
+    public ProductSize convertToProductSize(ProductSizeDTO productSizeDTO){
+        ProductSize productSize = new ProductSize();
+        productSize.setProductSizeId(productSizeDTO.getProductSizeId());
+        productSize.setSizeName(productSizeDTO.getSizeName());
+        return productSize;
     }
 
     public UserDTO convertToUserDTO(User user){
@@ -98,11 +146,6 @@ public class ConvertRelationship {
     }
 
 
-    public Stock  convertToStock(StockDTO stockDTO){
-        Stock stock = new Stock();
-        stock.setQuantity(stockDTO.getQuantity());
-        return stock;
-    }
 
     public List<AuthorizeDTO> converToAuthorizeDTOList(List<Authorize> authorizeList){
         List<AuthorizeDTO> authorizeDTOList = new ArrayList<>();

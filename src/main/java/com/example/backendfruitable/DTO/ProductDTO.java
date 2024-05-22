@@ -51,8 +51,7 @@ public class ProductDTO {
 
     private List<CommentDTO> commentList;
 
-    @NotNull(message = "Số lượng sản phẩm tồn kho không được để trống")
-    private StockDTO stock;
+    private List<InventoryDTO> inventoryList;
 
 
     private UserDTO user;

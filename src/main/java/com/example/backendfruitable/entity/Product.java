@@ -53,8 +53,8 @@ public class Product {
     private List<Comment> commentList;
 
     // số lượng sản phẩm còn lại trong cửa hàng
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "product")
-    private Stock stock;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "product")
+    private List<Inventory> inventoryList;
 
     // Danh mục
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})

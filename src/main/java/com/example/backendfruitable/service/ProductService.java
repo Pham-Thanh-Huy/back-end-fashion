@@ -1,11 +1,8 @@
 package com.example.backendfruitable.service;
 
-import com.example.backendfruitable.DTO.BaseResponse;
-import com.example.backendfruitable.DTO.ImageDTO;
-import com.example.backendfruitable.DTO.ProductDTO;
-import com.example.backendfruitable.DTO.StockDTO;
-import com.example.backendfruitable.repository.*;
+import com.example.backendfruitable.DTO.*;
 import com.example.backendfruitable.entity.*;
+import com.example.backendfruitable.repository.*;
 import com.example.backendfruitable.utils.Constant;
 import com.example.backendfruitable.utils.ConvertRelationship;
 import com.example.backendfruitable.utils.Recursive;
@@ -40,22 +37,20 @@ public class ProductService {
     private ImageRepository imageRepository;
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private CategoryProductRepository categoryProductRepository;
-
     @Autowired
-    private StockRepository stockRepository;
-
+    private InventoryRepository inventoryRepository;
+    @Autowired
+    private ProductSizeRepository productSizeRepository;
+    @Autowired
+    private ProductColorRepository productColorRepository;
     @Autowired
     private Recursive recursive;
-
     @Autowired
     private ConvertRelationship convertRelationship;
-
     @Autowired
     private MinioClient minioClient;
-
     @Value("${minio.bucket}")
     private String minioBucketName;
 
@@ -81,7 +76,7 @@ public class ProductService {
                 productDTO.setProductName(product.getProductName());
                 productDTO.setProductPrice(product.getProductPrice());
                 productDTO.setCreatedAt(product.getCreatedAt());
-                productDTO.setStock(convertRelationship.convertToStockDTO(product.getStock()));
+                productDTO.setInventoryList(convertRelationship.convertToInventoryDTOList(product.getInventoryList()));
                 productDTO.setUser(convertRelationship.convertToUserDTO(product.getUser()));
                 productDTO.setCategoryProduct(convertRelationship.convertToCategoryProductDTO(product.getCategoryProduct()));
 
@@ -113,7 +108,6 @@ public class ProductService {
     }
 
 
-
     public BaseResponse<ProductDTO> getProductById(Long id) {
         BaseResponse<ProductDTO> baseResponse = new BaseResponse<>();
         try {
@@ -135,7 +129,7 @@ public class ProductService {
             productDTO.setProductPrice(product.getProductPrice());
             productDTO.setCreatedAt(product.getCreatedAt());
             productDTO.setImageList(convertRelationship.convertToImageDTOList(product.getImageList()));
-            productDTO.setStock(convertRelationship.convertToStockDTO(product.getStock()));
+            productDTO.setInventoryList(convertRelationship.convertToInventoryDTOList(product.getInventoryList()));
             productDTO.setUser(convertRelationship.convertToUserDTO(product.getUser()));
             productDTO.setCategoryProduct(convertRelationship.convertToCategoryProductDTO(product.getCategoryProduct()));
 
@@ -166,59 +160,59 @@ public class ProductService {
     }
 
 
-    public BaseResponse<List<ProductDTO>> getProductByCategoryProductId(Long categoryId){
-            BaseResponse<List<ProductDTO>> baseResponse = new BaseResponse<>();
-            List<ProductDTO> productDTOList = new ArrayList<>();
-            try{
-                // lấy list categoryProduct nếu đó là danh mục cha và có nhiều danh mục con
-                List<CategoryProduct> categoryProductList = recursive.getAllChildrenCategoryProduct(categoryId);
+    public BaseResponse<List<ProductDTO>> getProductByCategoryProductId(Long categoryId) {
+        BaseResponse<List<ProductDTO>> baseResponse = new BaseResponse<>();
+        List<ProductDTO> productDTOList = new ArrayList<>();
+        try {
+            // lấy list categoryProduct nếu đó là danh mục cha và có nhiều danh mục con
+            List<CategoryProduct> categoryProductList = recursive.getAllChildrenCategoryProduct(categoryId);
 
-                if(categoryProductList == null || categoryProductList.isEmpty()){
-                    baseResponse.setMessage(Constant.EMPTY_CATEGORY_PRODUCT_BY_ID + categoryId);
-                    baseResponse.setCode(Constant.NOT_FOUND_CODE);
-                    return baseResponse;
-                }
-
-                //sau khi lấy được tất cả các menu con của menu cha nếu có
-                List<Long>  listCategoryId = new ArrayList<>();
-                for(CategoryProduct categoryProduct : categoryProductList){
-                    listCategoryId.add(categoryProduct.getCategoryId());
-                }
-                // query tất cả sản phẩm thuộc tất cả danh mục
-                List<Product> productList = productRepository.getListProductByCategoryProductId(listCategoryId);
-                if(productList == null || productList.isEmpty()){
-                    baseResponse.setMessage(Constant.EMPTY_ALL_PRODUCT + Constant.WITH_CATEGORY + categoryId);
-                    baseResponse.setCode(Constant.NOT_FOUND_CODE);
-                    return baseResponse;
-                }
-
-                for(Product product : productList){
-                    ProductDTO productDTO = new ProductDTO();
-                    productDTO.setProductId(product.getProductId());
-                    productDTO.setListedPrice(product.getListedPrice());
-                    productDTO.setOutstanding(product.getOutstanding());
-                    productDTO.setProductCode(product.getProductCode());
-                    productDTO.setProductDescription(product.getProductDescription());
-                    productDTO.setProductDetail(product.getProductDetail());
-                    productDTO.setProductName(product.getProductName());
-                    productDTO.setProductPrice(product.getProductPrice());
-                    productDTO.setCreatedAt(product.getCreatedAt());
-                    productDTO.setImageList(convertRelationship.convertToImageDTOList(product.getImageList()));
-                    productDTO.setStock(convertRelationship.convertToStockDTO(product.getStock()));
-                    productDTO.setUser(convertRelationship.convertToUserDTO(product.getUser()));
-                    productDTO.setCategoryProduct(convertRelationship.convertToCategoryProductDTO(product.getCategoryProduct()));
-
-                    productDTOList.add(productDTO);
-                }
-
-                baseResponse.setData(productDTOList);
-                baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
-                baseResponse.setCode(Constant.SUCCESS_CODE);
-            }catch (Exception e){
-                baseResponse.setMessage(Constant.ERROR_TO_GET_PRODUCT + e.getMessage());
-                baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+            if (categoryProductList == null || categoryProductList.isEmpty()) {
+                baseResponse.setMessage(Constant.EMPTY_CATEGORY_PRODUCT_BY_ID + categoryId);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
             }
-            return baseResponse;
+
+            //sau khi lấy được tất cả các menu con của menu cha nếu có
+            List<Long> listCategoryId = new ArrayList<>();
+            for (CategoryProduct categoryProduct : categoryProductList) {
+                listCategoryId.add(categoryProduct.getCategoryId());
+            }
+            // query tất cả sản phẩm thuộc tất cả danh mục
+            List<Product> productList = productRepository.getListProductByCategoryProductId(listCategoryId);
+            if (productList == null || productList.isEmpty()) {
+                baseResponse.setMessage(Constant.EMPTY_ALL_PRODUCT + Constant.WITH_CATEGORY + categoryId);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
+            }
+
+            for (Product product : productList) {
+                ProductDTO productDTO = new ProductDTO();
+                productDTO.setProductId(product.getProductId());
+                productDTO.setListedPrice(product.getListedPrice());
+                productDTO.setOutstanding(product.getOutstanding());
+                productDTO.setProductCode(product.getProductCode());
+                productDTO.setProductDescription(product.getProductDescription());
+                productDTO.setProductDetail(product.getProductDetail());
+                productDTO.setProductName(product.getProductName());
+                productDTO.setProductPrice(product.getProductPrice());
+                productDTO.setCreatedAt(product.getCreatedAt());
+                productDTO.setImageList(convertRelationship.convertToImageDTOList(product.getImageList()));
+                productDTO.setInventoryList(convertRelationship.convertToInventoryDTOList(product.getInventoryList()));
+                productDTO.setUser(convertRelationship.convertToUserDTO(product.getUser()));
+                productDTO.setCategoryProduct(convertRelationship.convertToCategoryProductDTO(product.getCategoryProduct()));
+
+                productDTOList.add(productDTO);
+            }
+
+            baseResponse.setData(productDTOList);
+            baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
+            baseResponse.setCode(Constant.SUCCESS_CODE);
+        } catch (Exception e) {
+            baseResponse.setMessage(Constant.ERROR_TO_GET_PRODUCT + e.getMessage());
+            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+        }
+        return baseResponse;
     }
 
     public BaseResponse<ProductDTO> addProduct(ProductDTO productDTO, Long categoryProductId, Long userId) {
@@ -279,14 +273,75 @@ public class ProductService {
                 imageProductList.add(imageProduct);
             }
 
-            //add bên stock
-            Stock stock = convertRelationship.convertToStock(productDTO.getStock());
-            stock.setProduct(product);
+            //add bên inventory
+
+            if (productDTO.getInventoryList() == null || productDTO.getInventoryList().isEmpty()) {
+                baseResponse.setMessage(Constant.INVENTORY_LIST_REQUIRED);
+                baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                return baseResponse;
+            }
+
+            List<Inventory> inventoryList = new ArrayList<>();
+
+            for (InventoryDTO inventoryDTO : productDTO.getInventoryList()) {
+                if (inventoryDTO.getQuantity() == null || inventoryDTO.getQuantity() < 0) {
+                    baseResponse.setMessage(Constant.INVENTORY_QUANTITY_REQUIRED);
+                    baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                    return baseResponse;
+                }
+
+                if (inventoryDTO.getProductSize() == null) {
+                    baseResponse.setMessage(Constant.INVENTORY_PRODUCT_SIZE_REQUIRED);
+                    baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                    return baseResponse;
+                }
+
+                if (inventoryDTO.getProductSize().getProductSizeId() == null || inventoryDTO.getProductSize().getProductSizeId() <= 0 ) {
+                    baseResponse.setMessage(Constant.INVENTORY_PRODUCT_SIZE_ID_REQUIRED);
+                    baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                    return baseResponse;
+                }
+
+                if (inventoryDTO.getProductColor() == null) {
+                    baseResponse.setMessage(Constant.INVENTORY_PRODUCT_COLOR_REQUIRED);
+                    baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                    return baseResponse;
+                }
+                if (inventoryDTO.getProductColor().getProductColorId() == null || inventoryDTO.getProductColor().getProductColorId() <= 0) {
+                    baseResponse.setMessage(Constant.INVENTORY_PRODUCT_COLOR_ID_REQUIRED);
+                    baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                    return baseResponse;
+                }
+                int productSizeId = inventoryDTO.getProductSize().getProductSizeId();
+                int productColorId = inventoryDTO.getProductColor().getProductColorId();
+                ProductSize productSize = productSizeRepository.findProductSizeByProductSizeId(productSizeId);
+                ProductColor productColor = productColorRepository.findProductColorByProductColorId(productColorId);
+                if(productSize == null){
+                    baseResponse.setMessage(Constant.EMPTY_PRODUCT_SIZE_BY_ID + productSizeId);
+                    baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                    return baseResponse;
+                }
+                if(productColor == null){
+                    baseResponse.setMessage(Constant.EMPTY_PRODUCT_COLOR_BY_ID + productColorId);
+                    baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                    return baseResponse;
+                }
+//                nếu qua tất cả điều kiện validate thì bắt đầu chuyển sang entity từ dto
+                Inventory inventory = new Inventory();
+                inventory.setInventoryId(inventoryDTO.getInventoryId());
+                inventory.setQuantity(inventoryDTO.getQuantity());
+                inventory.setQuantity(inventoryDTO.getQuantity());
+                inventory.setProductSize(productSize);
+                inventory.setProductColor(productColor);
+                inventory.setProduct(product);
+                inventoryList.add(inventory);
+            }
+
 
             //add vào csdl
             productRepository.save(product);
             imageRepository.saveAll(imageProductList);
-            stockRepository.save(stock);
+            inventoryRepository.saveAll(inventoryList);
 
 
             baseResponse.setData(productDTO);
@@ -328,12 +383,6 @@ public class ProductService {
                 return baseResponse;
             }
 
-            if (product == null) {
-                baseResponse.setData(null);
-                baseResponse.setMessage(Constant.EMPTY_PRODUCT_BY_ID + productId);
-                baseResponse.setCode(Constant.NOT_FOUND_CODE);
-                return baseResponse;
-            }
 
             product.setProductName(productDTO.getProductName());
             product.setProductCode(productDTO.getProductCode());
@@ -379,20 +428,11 @@ public class ProductService {
                 }
             }
 
-            Stock stockExists = product.getStock();
-            StockDTO stockDTO = productDTO.getStock();
-
-            if (stockExists.getStockId() != stockDTO.getStockId()) {
-                baseResponse.setMessage(Constant.ERROR_STOCK_ID_COMPARE_PRODUCT_GET_STOCK_ID);
-                baseResponse.setCode(Constant.BAD_REQUEST_CODE);
-                return  baseResponse;
-            }
-            stockExists.setQuantity(stockDTO.getQuantity());
 
             // update vào trong csdl
             productRepository.save(product);
             imageRepository.saveAll(imageProductExits);
-            stockRepository.save(stockExists);
+
 
             baseResponse.setData(productDTO);
             baseResponse.setMessage(Constant.SUCCESS_UPDATE_MESSAGE);
@@ -420,7 +460,7 @@ public class ProductService {
 
             // xoá hình ảnh trong minio
             List<ImageProduct> imageProductList = product.getImageList();
-            for(ImageProduct imageProduct : imageProductList){
+            for (ImageProduct imageProduct : imageProductList) {
                 String object = imageProduct.getImageProduct();
                 minioClient.removeObject(RemoveObjectArgs.builder().bucket(minioBucketName).object(object).build());
             }

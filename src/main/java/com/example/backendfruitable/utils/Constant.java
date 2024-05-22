@@ -65,8 +65,22 @@ public class Constant {
     public static final String ERROR_TO_ACTIVE_USER = "Lỗi trong quá trình xác thực người dùng: ";
 
 
-    //constant với stock
-    public static final String ERROR_STOCK_ID_COMPARE_PRODUCT_GET_STOCK_ID = "Id của số lượng không trùng với id số lượng của sản phẩm hiện tại nên không thể sửa";
+    //constant với Inventory
+    public static final String ERROR_INVENTORY_ID_COMPARE_PRODUCT_GET_INVENTORY_ID = "Id của số lượng không trùng với id số lượng của sản phẩm hiện tại nên không thể sửa";
+    public static final String INVENTORY_LIST_REQUIRED = "Trường tồn kho sản phẩm không dược để trống";
+    public static final String INVENTORY_QUANTITY_REQUIRED = "Số lượng sản phẩm trong tồn kho không được để trống";
+    public static final String INVENTORY_PRODUCT_SIZE_REQUIRED = "Size sản phẩm trong tồn kho không được để trống";
+    public static final String INVENTORY_PRODUCT_SIZE_ID_REQUIRED = "ID size sản phẩm trong tồn kho không được để trống";
+    public static final String INVENTORY_PRODUCT_COLOR_REQUIRED = "Màu sản phẩm trong tồn kho không được để trống";
+    public static final String INVENTORY_PRODUCT_COLOR_ID_REQUIRED = "ID màu sản phẩm trong tồn kho không được để trống";
+
+
+    // Constant với product size
+    public static final String EMPTY_PRODUCT_SIZE_BY_ID = "Không tồn tại size sản phẩm với id là: ";
+
+    // Constant với product color
+    public static final String EMPTY_PRODUCT_COLOR_BY_ID = "Không tồn tại sản phẩm với id màu sắc là: ";
+
 
     // Constant với categoryPost
     public static final String EMPTY_ALL_CATEGORY_POST = "Không tìm thấy danh mục bài viết nào";

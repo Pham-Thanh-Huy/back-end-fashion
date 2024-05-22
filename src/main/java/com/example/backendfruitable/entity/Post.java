@@ -17,6 +17,7 @@ public class Post {
     private Long postId;
 
 
+
     // tiêu đề bài viết
     @Column(name = "post_title", length = 255)
     private String postTitle;

@@ -27,4 +27,12 @@ public class OrderDetail {
     @JoinColumn(name = "order_id")
     @JsonIgnore
     private Order order;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinColumn(name = "product_size_id")
+    private ProductSize productSize;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinColumn(name = "product_color_id")
+    private ProductColor productColor;
 }
