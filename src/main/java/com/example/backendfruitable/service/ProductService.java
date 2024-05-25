@@ -18,6 +18,7 @@ import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.http.Method;
 import io.swagger.v3.core.util.Json;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,30 +40,31 @@ import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ProductService {
-    @Autowired
-    private ProductRepository productRepository;
 
-    @Autowired
-    private ImageRepository imageRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private CategoryProductRepository categoryProductRepository;
-    @Autowired
-    private InventoryRepository inventoryRepository;
-    @Autowired
-    private ProductSizeRepository productSizeRepository;
-    @Autowired
-    private ProductColorRepository productColorRepository;
-    @Autowired
-    private Recursive recursive;
-    @Autowired
-    private ConvertRelationship convertRelationship;
-    @Autowired
-    private MinioClient minioClient;
+    private final ProductRepository productRepository;
+
+    private final ImageRepository imageRepository;
+
+    private final UserRepository userRepository;
+
+    private final CategoryProductRepository categoryProductRepository;
+
+    private final InventoryRepository inventoryRepository;
+
+    private final ProductSizeRepository productSizeRepository;
+
+    private final ProductColorRepository productColorRepository;
+
+    private final Recursive recursive;
+
+    private final ConvertRelationship convertRelationship;
+
+    private final MinioClient minioClient;
     @Value("${minio.bucket}")
     private String minioBucketName;
+
 
     public BaseResponse<Page<ProductDTO>> getAllProduct(Pageable pageable) {
         BaseResponse<Page<ProductDTO>> baseResponse = new BaseResponse<>();
@@ -601,8 +603,6 @@ public class ProductService {
             }
            List<Inventory> inventoryAddList =  inventoryRepository.saveAll(inventoryList);
             List<InventoryDTO> inventoryDTOList =  convertRelationship.convertToInventoryDTOList(inventoryAddList);
-
-
 
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectNode objectNode = objectMapper.createObjectNode();
