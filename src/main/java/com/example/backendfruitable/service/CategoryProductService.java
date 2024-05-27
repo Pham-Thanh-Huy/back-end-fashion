@@ -8,7 +8,7 @@ import com.example.backendfruitable.entity.CategoryProduct;
 import com.example.backendfruitable.entity.User;
 import com.example.backendfruitable.utils.Constant;
 import com.example.backendfruitable.utils.ConvertRelationship;
-import com.example.backendfruitable.utils.Recursive;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -30,8 +30,7 @@ public class CategoryProductService {
     @Autowired
     private ConvertRelationship convertRelationship;
 
-    @Autowired
-    private Recursive recursive;
+
 
     public BaseResponse<List<CategoryProductDTO>> getAllCategoryProduct() {
         BaseResponse<List<CategoryProductDTO>> baseResponse = new BaseResponse<>();
@@ -75,7 +74,7 @@ public class CategoryProductService {
          try{
             Page<CategoryProduct> categoryProductPage = categoryProductRepository.findAll(pageable);
 
-            if(categoryProductPage == null || categoryProductPage.isEmpty()){
+            if(categoryProductPage.isEmpty()){
                 baseResponse.setMessage(Constant.EMPTY_ALL_CATEGORY_PRODUCT);
                 baseResponse.setCode(Constant.NOT_FOUND_CODE);
                 return  baseResponse;

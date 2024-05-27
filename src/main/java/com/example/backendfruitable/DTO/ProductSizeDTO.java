@@ -3,6 +3,7 @@ package com.example.backendfruitable.DTO;
 import com.example.backendfruitable.entity.Inventory;
 import com.example.backendfruitable.entity.Order;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 public class ProductSizeDTO {
     private Integer productSizeId;
 
+    @NotBlank(message = "Tên size không được để trống")
     private String sizeName;
 
     //    ---- JsonIgnore--------

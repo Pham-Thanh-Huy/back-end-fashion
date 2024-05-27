@@ -81,6 +81,10 @@ public class Constant {
 
     // Constant với product size
     public static final String EMPTY_PRODUCT_SIZE_BY_ID = "Không tồn tại size sản phẩm với id là: ";
+    public static final String ERROR_TO_GET_PRODUCT_SIZE = "Lỗi trong quá trình lấy size:  ";
+    public static final String EMPTY_ALL_PRODUCT_SIZE = "Không tồn tại size sản phẩm nào";
+    public static final String ERROR_TO_ADD_PRODUCT_SIZE = "Lỗi trong quá trình thêm size sản phẩm: ";
+    public static final String DELETE_SUCCESS_SIZE_PRODUCT_BY_ID = "Xoá thành công size với id là: ";
 
     // Constant với product color
     public static final String EMPTY_PRODUCT_COLOR_BY_ID = "Không tồn tại sản phẩm với id màu sắc là: ";

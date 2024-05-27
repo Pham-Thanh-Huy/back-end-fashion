@@ -319,11 +319,13 @@ public class ProductService {
                     baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                     return baseResponse;
                 }
+
                 if (inventoryDTO.getProductColor().getProductColorId() == null || inventoryDTO.getProductColor().getProductColorId() <= 0) {
                     baseResponse.setMessage(Constant.INVENTORY_PRODUCT_COLOR_ID_REQUIRED);
                     baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                     return baseResponse;
                 }
+
                 int productSizeId = inventoryDTO.getProductSize().getProductSizeId();
                 int productColorId = inventoryDTO.getProductColor().getProductColorId();
                 ProductSize productSize = productSizeRepository.findProductSizeByProductSizeId(productSizeId);
