@@ -15,7 +15,8 @@ public class SecurityEndpoints {
             "/api/user/get/by/username",
             "/api/delivery-method/get/**",
             "/api/payment-method/get/*",
-            "/api/order/get/*"
+            "/api/order/get/*",
+            "/api/product-size/get/*",
     };
 
     public static final String[] ADMIN_STAFF_GET_ENDPOINTS = {
@@ -48,7 +49,8 @@ public class SecurityEndpoints {
             "/api/post/add",
             "/api/delivery-method/add",
             "/api/payment-method/add",
-            "/api/product/add/inventory"
+            "/api/product/add/inventory",
+            "/api/product-size/add"
 
     };
 
