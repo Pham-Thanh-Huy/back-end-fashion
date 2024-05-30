@@ -47,6 +47,7 @@ public class Constant {
     public static final String USER_HAS_BEEN_AUTHENTICATED = "User đã được kích hoạt và không thể kích hoạt lại";
     public static final String USER_IS_NOT_ACTIVE = "Tài khoản này chưa được xác thực, vui lòng xác thực tài khoản";
     public static final String EMPTY_USER_BY_USERNAME = "Không tồn tại username là: ";
+    public static final String USER_AGE_SMALL_THAN_100 = "Tuoi khong duoc qua 100";
 
     // Constant với Authorize
     public static final String EMPTY_AUTHORIZE_BY_ID = "Không tìm thấy quyền hạn với id là: ";

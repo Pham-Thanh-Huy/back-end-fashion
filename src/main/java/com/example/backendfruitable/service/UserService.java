@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Service
@@ -246,8 +247,9 @@ public class UserService {
 
     public BaseResponse<UserDTO> addUser(UserDTO userDTO){
         BaseResponse<UserDTO> baseResponse = new BaseResponse<>();
+        log.info("Service : Add User");
         try{
-            if(userDTO.getDataImage() == null || userDTO.getDataImage().length == 0){
+            if(userDTO.getDataImage() == null){
                 baseResponse.setMessage(Constant.EMPTY_BASE64_IMAGE);
                 baseResponse.setCode(Constant.BAD_REQUEST_CODE);
             }
@@ -271,6 +273,11 @@ public class UserService {
                 baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                 return  baseResponse;
             }
+            if(userDTO.getAge() > 100){
+                baseResponse.setMessage(Constant.USER_AGE_SMALL_THAN_100);
+                baseResponse.setCode(Constant.BAD_REQUEST_CODE);
+                return baseResponse;
+            }
 
             User user = new User();
             user.setUserId(userDTO.getUserId());
@@ -286,8 +293,8 @@ public class UserService {
             String randomTokenActive = codeActive();
             user.setToken_active(randomTokenActive);
             user.setIsActive(true);
+            byte[] imageData = Base64.getDecoder().decode(Base64.getEncoder().encode(userDTO.getDataImage().getBytes(StandardCharsets.UTF_8)));
 
-            byte[] imageData = Base64.getDecoder().decode(Base64.getEncoder().encode(userDTO.getDataImage()));
             InputStream inputStream = new ByteArrayInputStream(imageData);
             String objectName = "user_" + System.currentTimeMillis() + ".jpg";
 
@@ -328,7 +335,7 @@ public class UserService {
     public BaseResponse<UserDTO> registerUser(UserDTO userDTO) {
         BaseResponse<UserDTO> baseResponse = new BaseResponse<>();
         try {
-            if(userDTO.getDataImage() == null || userDTO.getDataImage().length == 0){
+            if(userDTO.getDataImage() == null ){
                 baseResponse.setMessage(Constant.EMPTY_BASE64_IMAGE);
                 baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                 return baseResponse;
@@ -368,7 +375,7 @@ public class UserService {
             user.setIsActive(false);
 
             //xử lý hình ảnh
-            byte[] imageByte = Base64.getDecoder().decode(Base64.getEncoder().encode(userDTO.getDataImage()));
+            byte[] imageByte = Base64.getDecoder().decode(Base64.getEncoder().encode(userDTO.getDataImage().getBytes(StandardCharsets.UTF_8)));
             InputStream inputStream = new ByteArrayInputStream(imageByte);
             String objectName = "user_" + System.currentTimeMillis() + ".jpg";
             // config minio
@@ -457,8 +464,8 @@ public class UserService {
             user.setAddress(userDTO.getAddress());
             user.setPhoneNumber(userDTO.getPhoneNumber());
             //update Hình ảnh nếu có update không thì sẽ không update
-            if(userDTO.getDataImage() != null && userDTO.getDataImage().length > 0){
-                byte[] newImage = Base64.getDecoder().decode(Base64.getEncoder().encode(userDTO.getDataImage()));
+            if(userDTO.getDataImage() != null){
+                byte[] newImage = Base64.getDecoder().decode(Base64.getEncoder().encode(userDTO.getDataImage().getBytes(StandardCharsets.UTF_8)));
                 InputStream inputStream = new ByteArrayInputStream(newImage);
                 // lấy object hiện tại và delete
                 String object = userDTO.getUserImage();
