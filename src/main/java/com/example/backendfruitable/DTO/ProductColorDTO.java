@@ -2,6 +2,7 @@ package com.example.backendfruitable.DTO;
 
 import com.example.backendfruitable.entity.OrderDetail;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
 public class ProductColorDTO {
     private Integer productColorId;
 
+    @NotBlank(message = "Tên màu sản phẩm không được để trống")
     private String colorName;
 
     //    ---- JsonIgnore--------

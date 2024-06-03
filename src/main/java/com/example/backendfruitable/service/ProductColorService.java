@@ -3,12 +3,15 @@ package com.example.backendfruitable.service;
 
 import com.example.backendfruitable.DTO.BaseResponse;
 import com.example.backendfruitable.DTO.ProductColorDTO;
+import com.example.backendfruitable.DTO.ProductDTO;
+import com.example.backendfruitable.entity.Product;
 import com.example.backendfruitable.entity.ProductColor;
 import com.example.backendfruitable.repository.ProductColorRepository;
 import com.example.backendfruitable.utils.Constant;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +25,8 @@ public class ProductColorService {
 
     private final ProductColorRepository productColorRepository;
 
-    public BaseResponse<List<ProductColorDTO>> getAllProductColor(Pageable pageable) {
-        BaseResponse<List<ProductColorDTO>> baseResponse = new BaseResponse<>();
+    public BaseResponse<Page<ProductColorDTO>> getAllProductColor(Pageable pageable) {
+        BaseResponse<Page<ProductColorDTO>> baseResponse = new BaseResponse<>();
         try {
             Page<ProductColor> productColorPage = productColorRepository.findAll(pageable);
             if (ObjectUtils.isEmpty(productColorPage)) {
@@ -41,7 +44,10 @@ public class ProductColorService {
                     })
                     .collect(Collectors.toList());
 
-            baseResponse.setData(productColorDTOList);
+            Page<ProductColorDTO> productColorDTOPage = new PageImpl<>(productColorDTOList, pageable, productColorPage.getTotalElements());
+
+
+            baseResponse.setData(productColorDTOPage);
             baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
             baseResponse.setCode(Constant.SUCCESS_CODE);
         } catch (Exception e) {
@@ -75,6 +81,25 @@ public class ProductColorService {
 
         } catch (Exception e) {
             baseResponse.setMessage(Constant.ERROR_TO_GET_PRODUCT_COLOR + e.getMessage());
+            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+        }
+        return baseResponse;
+    }
+
+    public BaseResponse<ProductColorDTO> addProductColor(ProductColorDTO productColorDTO) {
+        BaseResponse<ProductColorDTO> baseResponse = new BaseResponse<>();
+        try {
+          ProductColor productColor = new ProductColor();
+          productColor.setColorName(productColorDTO.getColorName());
+
+          productColorRepository.save(productColor);
+
+          baseResponse.setData(productColorDTO);
+          baseResponse.setMessage(Constant.SUCCESS_ADD_MESSAGE);
+          baseResponse.setCode(Constant.SUCCESS_CODE);
+
+        } catch (Exception e) {
+            baseResponse.setMessage(Constant.ERROR_TO_ADD_PRODUCT_COLOR + e.getMessage());
             baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
         }
         return baseResponse;
