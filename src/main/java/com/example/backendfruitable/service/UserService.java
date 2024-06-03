@@ -293,7 +293,7 @@ public class UserService {
             String randomTokenActive = codeActive();
             user.setToken_active(randomTokenActive);
             user.setIsActive(true);
-            byte[] imageData = Base64.getDecoder().decode(Base64.getEncoder().encode(userDTO.getDataImage().getBytes(StandardCharsets.UTF_8)));
+            byte[] imageData = Base64.getDecoder().decode((userDTO.getDataImage()));
 
             InputStream inputStream = new ByteArrayInputStream(imageData);
             String objectName = "user_" + System.currentTimeMillis() + ".jpg";
@@ -375,7 +375,7 @@ public class UserService {
             user.setIsActive(false);
 
             //xử lý hình ảnh
-            byte[] imageByte = Base64.getDecoder().decode(Base64.getEncoder().encode(userDTO.getDataImage().getBytes(StandardCharsets.UTF_8)));
+            byte[] imageByte = Base64.getDecoder().decode(userDTO.getDataImage());
             InputStream inputStream = new ByteArrayInputStream(imageByte);
             String objectName = "user_" + System.currentTimeMillis() + ".jpg";
             // config minio
@@ -465,7 +465,7 @@ public class UserService {
             user.setPhoneNumber(userDTO.getPhoneNumber());
             //update Hình ảnh nếu có update không thì sẽ không update
             if(userDTO.getDataImage() != null){
-                byte[] newImage = Base64.getDecoder().decode(Base64.getEncoder().encode(userDTO.getDataImage().getBytes(StandardCharsets.UTF_8)));
+                byte[] newImage = Base64.getDecoder().decode(userDTO.getDataImage());
                 InputStream inputStream = new ByteArrayInputStream(newImage);
                 // lấy object hiện tại và delete
                 String object = userDTO.getUserImage();

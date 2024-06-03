@@ -89,6 +89,8 @@ public class Constant {
 
     // Constant với product color
     public static final String EMPTY_PRODUCT_COLOR_BY_ID = "Không tồn tại sản phẩm với id màu sắc là: ";
+    public static final String ERROR_TO_GET_PRODUCT_COLOR = "Lỗi trong quá trình lấy màu sản phẩm: ";
+    public static final String EMPTY_ALL_PRODUCT_COLOR = "Không tìm thấy bất kì màu sản phẩm nào trong hệ thng";
 
 
     // Constant với categoryPost

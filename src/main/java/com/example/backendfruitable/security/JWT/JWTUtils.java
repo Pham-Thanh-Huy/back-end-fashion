@@ -15,8 +15,8 @@ import java.util.Map;
 
 @Component
 public class JWTUtils {
-
     private final UserRepository userRepository;
+
     @Value("${jwt.secretKey}")
     private String SECRET;
 

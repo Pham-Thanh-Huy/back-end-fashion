@@ -58,7 +58,7 @@ public class ProductController {
     @PostMapping("/add/inventory")
     public ResponseEntity<BaseResponse<ObjectNode>> addInventoryProduct(@RequestBody JsonNode jsonNode,
                                                                         @RequestParam("productId") Long productId){
-        BaseResponse<ObjectNode> baseResponse = productService.addInventoryproduct(productId, jsonNode);
+        BaseResponse<ObjectNode> baseResponse = productService.addInventoryProduct(productId, jsonNode);
         return new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
     }
 

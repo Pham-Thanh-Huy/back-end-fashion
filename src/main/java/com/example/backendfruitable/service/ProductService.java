@@ -371,7 +371,7 @@ public class ProductService {
         return baseResponse;
     }
 
-    public BaseResponse<ObjectNode> addInventoryproduct(Long productId, JsonNode jsonNode) {
+    public BaseResponse<ObjectNode> addInventoryProduct(Long productId, JsonNode jsonNode) {
         BaseResponse<ObjectNode> baseResponse = new BaseResponse<>();
         try {
             Product product = productRepository.getProductById(productId);
