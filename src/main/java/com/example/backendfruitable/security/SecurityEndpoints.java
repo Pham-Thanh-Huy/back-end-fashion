@@ -51,7 +51,8 @@ public class SecurityEndpoints {
             "/api/delivery-method/add",
             "/api/payment-method/add",
             "/api/product/add/inventory",
-            "/api/product-size/add"
+            "/api/product-size/add",
+            "/api/product-color/add"
 
     };
 
