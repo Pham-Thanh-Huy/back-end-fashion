@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class Recursive {
+public class     Recursive {
     @Autowired
     private CategoryProductRepository categoryProductRepository;
 

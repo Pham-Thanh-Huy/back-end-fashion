@@ -8,6 +8,7 @@ import com.example.backendfruitable.entity.CategoryPost;
 import com.example.backendfruitable.entity.User;
 import com.example.backendfruitable.utils.Constant;
 import com.example.backendfruitable.utils.ConvertRelationship;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -19,15 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryPostService {
-    @Autowired
-    private CategoryPostRepository categoryPostRepository;
 
-    @Autowired
-    private ConvertRelationship convertRelationship;
+    private final CategoryPostRepository categoryPostRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final ConvertRelationship convertRelationship;
+
+    private final UserRepository userRepository;
 
     public BaseResponse<List<CategoryPostDTO>> getAllCategoryPost() {
         BaseResponse<List<CategoryPostDTO>> baseResponse = new BaseResponse<>();
