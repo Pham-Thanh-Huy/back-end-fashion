@@ -9,6 +9,7 @@ import com.example.backendfruitable.entity.User;
 import com.example.backendfruitable.utils.Constant;
 import com.example.backendfruitable.utils.ConvertRelationship;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,15 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryProductService {
-    @Autowired
-    private CategoryProductRepository categoryProductRepository;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ConvertRelationship convertRelationship;
+    private final CategoryProductRepository categoryProductRepository;
+    private final UserRepository userRepository;
+    private final ConvertRelationship convertRelationship;
 
 
 

@@ -14,6 +14,7 @@ import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.http.Method;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,31 +34,25 @@ import java.util.*;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UserService {
-    @Autowired
-    private UserRepository userRepository;
 
-    @Autowired
-    private ConvertRelationship convertRelationship;
-
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
-    private AuthorizeRepository authorizeRepository;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private JWTUtils jwtUtils;
-
-    @Autowired
-    private EmailConfig emailConfig;
+    private final UserRepository userRepository;
 
 
-    @Autowired
-    private MinioClient minioClient;
+    private final ConvertRelationship convertRelationship;
+
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    private final AuthorizeRepository authorizeRepository;
+
+    private final AuthenticationManager authenticationManager;
+
+    private final JWTUtils jwtUtils;
+
+    private final EmailConfig emailConfig;
+
+    private final MinioClient minioClient;
 
     @Value("${minio.bucket}")
     private String minioBucketName;

@@ -17,6 +17,7 @@ import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.http.Method;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -32,24 +33,20 @@ import java.util.Base64;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class PostService {
-    @Autowired
-    private PostRepository postRepository;
 
-    @Autowired
-    private ConvertRelationship convertRelationship;
+    private final PostRepository postRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final ConvertRelationship convertRelationship;
 
-    @Autowired
-    private CategoryPostRepository categoryPostRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private MinioClient minioClient;
+    private final CategoryPostRepository categoryPostRepository;
 
-    @Autowired
-    private Recursive recursive;
+    private final MinioClient minioClient;
+
+    private final Recursive recursive;
 
     @Value("${minio.bucket}")
     private String bucketName;

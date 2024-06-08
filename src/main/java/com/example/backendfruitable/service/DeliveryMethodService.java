@@ -9,6 +9,7 @@ import com.example.backendfruitable.repository.DeliveryMethodRepository;
 import com.example.backendfruitable.repository.UserRepository;
 import com.example.backendfruitable.utils.Constant;
 import com.example.backendfruitable.utils.ConvertRelationship;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,14 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class DeliveryMethodService {
 
-    @Autowired
     private DeliveryMethodRepository deliveryMethodRepository;
-
-    @Autowired
     private ConvertRelationship convertRelationship;
-    @Autowired
     private UserRepository userRepository;
 
     public BaseResponse<List<DeliveryMethodDTO>> getAllDeliveryMethod(){

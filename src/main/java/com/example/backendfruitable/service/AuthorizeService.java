@@ -6,6 +6,7 @@ import com.example.backendfruitable.entity.Authorize;
 import com.example.backendfruitable.repository.AuthorizeRepository;
 import com.example.backendfruitable.repository.UserRepository;
 import com.example.backendfruitable.utils.Constant;
+import lombok.RequiredArgsConstructor;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,13 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class AuthorizeService {
 
-    @Autowired
-    private AuthorizeRepository authorizeRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    private final AuthorizeRepository authorizeRepository;
 
 
     public BaseResponse<List<AuthorizeDTO>> getAllAuthorize(){

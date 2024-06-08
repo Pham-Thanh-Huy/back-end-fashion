@@ -11,6 +11,7 @@ import com.example.backendfruitable.utils.ConvertRelationship;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,27 +24,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class OrderService {
-    @Autowired
-    private OrderRepository orderRepository;
-    @Autowired
-    private OrderDetailRepository orderDetailRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private DeliveryMethodRepository deliveryMethodRepository;
-    @Autowired
-    private PaymentMethodRepository paymentMethodRepository;
-    @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private ConvertRelationship convertRelationship;
-    @Autowired
-    private ProductColorRepository productColorRepository;
-    @Autowired
-    private ProductSizeRepository productSizeRepository;
-    @Autowired
-    private InventoryRepository inventoryRepository;
+
+    private final OrderRepository orderRepository;
+
+    private final  OrderDetailRepository orderDetailRepository;
+
+    private final UserRepository userRepository;
+
+    private final DeliveryMethodRepository deliveryMethodRepository;
+
+    private final PaymentMethodRepository paymentMethodRepository;
+
+    private final ProductRepository productRepository;
+
+    private final ConvertRelationship convertRelationship;
+
+    private final ProductColorRepository productColorRepository;
+
+    private final ProductSizeRepository productSizeRepository;
+
+    private final InventoryRepository inventoryRepository;
 
     public BaseResponse<Page<OrderDTO>> getAllOrders(Pageable pageable) {
         BaseResponse<Page<OrderDTO>> baseResponse = new BaseResponse<>();

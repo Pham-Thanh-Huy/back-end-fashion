@@ -8,6 +8,7 @@ import com.example.backendfruitable.repository.PaymentMethodRepository;
 import com.example.backendfruitable.repository.UserRepository;
 import com.example.backendfruitable.utils.Constant;
 import com.example.backendfruitable.utils.ConvertRelationship;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,13 +17,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class PaymentMethodService {
-    @Autowired
-    private PaymentMethodRepository paymentMethodRepository;
-    @Autowired
-    private ConvertRelationship convertRelationship;
-    @Autowired
-    private UserRepository userRepository;
+
+    private final PaymentMethodRepository paymentMethodRepository;
+
+    private final ConvertRelationship convertRelationship;
+
+    private final UserRepository userRepository;
 
     public BaseResponse<List<PaymentMethodDTO>> getAllPaymentMethod() {
         BaseResponse<List<PaymentMethodDTO>> baseResponse = new BaseResponse<>();

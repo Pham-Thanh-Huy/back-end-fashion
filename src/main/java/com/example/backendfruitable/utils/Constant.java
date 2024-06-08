@@ -75,7 +75,7 @@ public class Constant {
     public static final String INVENTORY_PRODUCT_COLOR_REQUIRED = "Màu sản phẩm trong tồn kho không được để trống";
     public static final String INVENTORY_PRODUCT_COLOR_ID_REQUIRED = "ID màu sản phẩm trong tồn kho không được để trống";
     public static final String ERROR_TO_ADD_INVENTORY_IN_PRODUCT = "Lỗi trong quá trình thêm tồn kho vào sản phẩm: ";
-    public static final String PRODUCT_COLOR_ID_AND_PRODUCT_SIZE_ID_EXISTS_QUANTITY_IN_PRODUCT = "Size và màu của sản phẩm này đã được thêm số lượng";
+    public static final String PRODUCT_COLOR_ID_AND_PRODUCT_SIZE_ID_EXISTS_QUANTITY_IN_PRODUCT = "Size và màu của sản phẩm này đã được thêm trong tồn kho";
     public static final String ERROR_TO_UPDATE_INVENTORY_IN_PRODUCT = "Lỗi trong quá trình cập nhật tồn kho vào sản phẩm: ";
     public static final String NOT_FOUND_PRODUCT_SIZE_ID_AND_PRODUCT_COLOR_ID_IN_THIS_PRODUCT_INVENTORY = " không tồn tại màu và size với sản phẩm có id là: ";
 
