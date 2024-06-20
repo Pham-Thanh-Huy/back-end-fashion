@@ -583,7 +583,7 @@ public class UserService {
             baseResponse.setMessage(Constant.LOGIN_FAILED);
             baseResponse.setCode(Constant.BAD_REQUEST_CODE);
         }catch (Exception e){
-            log.error("Authentication failed: " + e.getMessage());
+            log.error(Constant.AUTHENTICATION_FAILED + e.getMessage());
             baseResponse.setMessage(Constant.LOGIN_FAILED);
             baseResponse.setCode(Constant.BAD_REQUEST_CODE);
         }

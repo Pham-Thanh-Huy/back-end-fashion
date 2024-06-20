@@ -64,6 +64,7 @@ public class Constant {
     public static final String AUTHENTICATION_CODE_IS_INCORRECT = "Mã xác thực không đúng";
     public static final String AUTHENTICATION_SUCCESS = "Xác thực thành công";
     public static final String ERROR_TO_ACTIVE_USER = "Lỗi trong quá trình xác thực người dùng: ";
+    public static final String AUTHENTICATION_FAILED = "Xác thực không thành công: ";
 
 
     //constant với Inventory
