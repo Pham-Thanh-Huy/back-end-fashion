@@ -403,7 +403,6 @@ public class OrderService {
                      return baseResponse;
                  }
 
-
                 // convert tiếp dto để tí trả ra response
                 orderDetailDTOConvertResponse.setTotalPrice(totalPrice);
                 orderDetailDTOConvertResponse.setQuantity(orderDetailDTO.getQuantity());

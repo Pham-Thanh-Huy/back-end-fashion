@@ -32,6 +32,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -367,6 +368,45 @@ public class ProductService {
         return baseResponse;
     }
 
+    public BaseResponse<Page<ProductDTO>> getProductOutstanding(Boolean outstanding, Pageable pageable) {
+        BaseResponse<Page<ProductDTO>> baseResponse = new BaseResponse<>();
+        try {
+            Page<Product> productPage = productRepository.getListProductByOutstanding(outstanding, pageable);
+            if (ObjectUtils.isEmpty(productPage)) {
+                baseResponse.setMessage(Constant.EMPTY_ALL_PRODUCT);
+                baseResponse.setCode(Constant.NOT_FOUND_CODE);
+                return baseResponse;
+            }
+
+            List<ProductDTO> productDTOList = productPage.stream()
+                    .map(product -> {
+                        ProductDTO productDTO = new ProductDTO();
+                        productDTO.setProductId(product.getProductId());
+                        productDTO.setListedPrice(product.getListedPrice());
+                        productDTO.setOutstanding(product.getOutstanding());
+                        productDTO.setProductCode(product.getProductCode());
+                        productDTO.setProductDescription(product.getProductDescription());
+                        productDTO.setProductDetail(product.getProductDetail());
+                        productDTO.setProductName(product.getProductName());
+                        productDTO.setProductPrice(product.getProductPrice());
+                        productDTO.setCreatedAt(product.getCreatedAt());
+                        productDTO.setImageList(convertRelationship.convertToImageDTOList(product.getImageList()));
+                        productDTO.setInventoryList(convertRelationship.convertToInventoryDTOList(product.getInventoryList()));
+                        productDTO.setUser(convertRelationship.convertToUserDTO(product.getUser()));
+                        productDTO.setCategoryProduct(convertRelationship.convertToCategoryProductDTO(product.getCategoryProduct()));
+                        return productDTO;
+                    }).collect(Collectors.toList());
+            Page<ProductDTO> productDTOPage = new PageImpl<>(productDTOList, pageable, productPage.getTotalPages());
+                baseResponse.setData(productDTOPage);
+                baseResponse.setMessage(Constant.SUCCESS_MESSAGE);
+                baseResponse.setCode(Constant.SUCCESS_CODE);
+        } catch (Exception e) {
+            baseResponse.setMessage(Constant.ERROR_TO_GET_PRODUCT + e.getMessage());
+            baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
+        }
+        return baseResponse;
+    }
+
     public BaseResponse<ObjectNode> addInventoryProduct(Long productId, JsonNode jsonNode) {
         BaseResponse<ObjectNode> baseResponse = new BaseResponse<>();
         try {
@@ -382,32 +422,32 @@ public class ProductService {
                 baseResponse.setMessage(Constant.INVENTORY_QUANTITY_REQUIRED);
                 baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                 return baseResponse;
-            }else{
-                 quantity = quantityJsonNode.asLong();
+            } else {
+                quantity = quantityJsonNode.asLong();
             }
             Integer productSizeId;
             Integer productColorId;
             JsonNode productSizeIdJsonNode = jsonNode.get("productSizeId");
             JsonNode productColorIdJsonNode = jsonNode.get("productColorId");
-            if(ObjectUtils.isEmpty(productSizeIdJsonNode)){
+            if (ObjectUtils.isEmpty(productSizeIdJsonNode)) {
                 baseResponse.setMessage(Constant.INVENTORY_PRODUCT_SIZE_ID_REQUIRED);
                 baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                 return baseResponse;
-            }else{
-                 productSizeId = productSizeIdJsonNode.asInt();
+            } else {
+                productSizeId = productSizeIdJsonNode.asInt();
             }
 
-            if(ObjectUtils.isEmpty(productColorIdJsonNode)){
+            if (ObjectUtils.isEmpty(productColorIdJsonNode)) {
                 baseResponse.setMessage(Constant.INVENTORY_PRODUCT_COLOR_ID_REQUIRED);
                 baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                 return baseResponse;
-            }else{
-                 productColorId = productColorIdJsonNode.asInt();
+            } else {
+                productColorId = productColorIdJsonNode.asInt();
             }
 
             // check xem  màu + size + số lượng sản phẩm đã tồn tại chưa nếu tồn tại rồi thì không cho thêm;
             for (Inventory inventory : product.getInventoryList()) {
-                if (inventory.getProductColor().getProductColorId() == productColorId && inventory.getProductSize().getProductSizeId() == productSizeId){
+                if (inventory.getProductColor().getProductColorId() == productColorId && inventory.getProductSize().getProductSizeId() == productSizeId) {
                     baseResponse.setMessage(Constant.PRODUCT_COLOR_ID_AND_PRODUCT_SIZE_ID_EXISTS_QUANTITY_IN_PRODUCT);
                     baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                     return baseResponse;
@@ -544,73 +584,73 @@ public class ProductService {
         return baseResponse;
     }
 
-    public BaseResponse<ObjectNode> updateQuantityInventoryProduct(Long productId, JsonNode jsonNode){
+    public BaseResponse<ObjectNode> updateQuantityInventoryProduct(Long productId, JsonNode jsonNode) {
         BaseResponse<ObjectNode> baseResponse = new BaseResponse<>();
-        try{
+        try {
             Product product = productRepository.getProductById(productId);
             if (product == null) {
                 baseResponse.setMessage(Constant.EMPTY_PRODUCT_BY_ID + productId);
                 baseResponse.setCode(Constant.NOT_FOUND_CODE);
                 return baseResponse;
             }
-            JsonNode inventoryListJsonNode =  jsonNode.get("inventoryList");
-            if(ObjectUtils.isEmpty(inventoryListJsonNode)){
+            JsonNode inventoryListJsonNode = jsonNode.get("inventoryList");
+            if (ObjectUtils.isEmpty(inventoryListJsonNode)) {
                 baseResponse.setMessage(Constant.INVENTORY_LIST_REQUIRED);
                 baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                 return baseResponse;
             }
             List<Inventory> inventoryList = new ArrayList<>(product.getInventoryList());
-            for(JsonNode inventoryJsonNode : inventoryListJsonNode){
+            for (JsonNode inventoryJsonNode : inventoryListJsonNode) {
                 Long quantity;
                 Integer productSizeId;
                 Integer productColorId;
                 JsonNode quantityJsonNode = inventoryJsonNode.get("quantity");
                 JsonNode productSizeIdJsonNode = inventoryJsonNode.get("productSizeId");
                 JsonNode productColorIdJsonNode = inventoryJsonNode.get("productColorId");
-                if(ObjectUtils.isEmpty(quantityJsonNode)){
+                if (ObjectUtils.isEmpty(quantityJsonNode)) {
                     baseResponse.setMessage(Constant.INVENTORY_QUANTITY_REQUIRED);
                     baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                     return baseResponse;
-                }else{
+                } else {
                     quantity = quantityJsonNode.asLong();
                 }
 
-                if(ObjectUtils.isEmpty(productSizeIdJsonNode)){
+                if (ObjectUtils.isEmpty(productSizeIdJsonNode)) {
                     baseResponse.setMessage(Constant.INVENTORY_PRODUCT_SIZE_ID_REQUIRED);
                     baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                     return baseResponse;
-                }else{
+                } else {
                     productSizeId = productSizeIdJsonNode.asInt();
                 }
 
-                if(ObjectUtils.isEmpty(productColorIdJsonNode)){
+                if (ObjectUtils.isEmpty(productColorIdJsonNode)) {
                     baseResponse.setMessage(Constant.INVENTORY_PRODUCT_COLOR_ID_REQUIRED);
                     baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                     return baseResponse;
-                }else {
+                } else {
                     productColorId = productColorIdJsonNode.asInt();
                 }
 
                 // tiếp tục kiểm tra
-                for(Inventory inventory : inventoryList){
-                    if( inventory.getProductSize().getProductSizeId() == productSizeId && inventory.getProductColor().getProductColorId() == productColorId){
+                for (Inventory inventory : inventoryList) {
+                    if (inventory.getProductSize().getProductSizeId() == productSizeId && inventory.getProductColor().getProductColorId() == productColorId) {
                         inventory.setQuantity(quantity);
                     }
                 }
 
             }
-           List<Inventory> inventoryAddList =  inventoryRepository.saveAll(inventoryList);
-            List<InventoryDTO> inventoryDTOList =  convertRelationship.convertToInventoryDTOList(inventoryAddList);
+            List<Inventory> inventoryAddList = inventoryRepository.saveAll(inventoryList);
+            List<InventoryDTO> inventoryDTOList = convertRelationship.convertToInventoryDTOList(inventoryAddList);
 
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectNode objectNode = objectMapper.createObjectNode();
             objectNode.put("productName", product.getProductName());
-            objectNode.putPOJO("inventoryList",  inventoryDTOList);
+            objectNode.putPOJO("inventoryList", inventoryDTOList);
 
             baseResponse.setData(objectNode);
             baseResponse.setMessage(Constant.SUCCESS_UPDATE_MESSAGE);
             baseResponse.setCode(Constant.SUCCESS_CODE);
-        }catch (Exception e){
+        } catch (Exception e) {
             baseResponse.setMessage(Constant.ERROR_TO_UPDATE_INVENTORY_IN_PRODUCT);
             baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
         }

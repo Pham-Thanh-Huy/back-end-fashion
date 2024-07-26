@@ -17,7 +17,8 @@ public class SecurityEndpoints {
             "/api/payment-method/get/*",
             "/api/order/get/*",
             "/api/product-size/get/*",
-            "/api/product-color/get/*"
+            "/api/product-color/get/*",
+            "/api/product/get/outstanding"
     };
 
     public static final String[] ADMIN_STAFF_GET_ENDPOINTS = {

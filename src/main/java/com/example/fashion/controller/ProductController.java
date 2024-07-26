@@ -39,6 +39,13 @@ public class ProductController {
         return new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
     }
 
+    @Operation(summary =  "Lấy sản phẩm nổi bật")
+    @GetMapping("/get/outstanding")
+    public ResponseEntity<BaseResponse<Page<ProductDTO>>> getOutstandingProduct(@RequestParam Boolean outstanding, Pageable pageable) {
+        BaseResponse<Page<ProductDTO>> baseResponse = productService.getProductOutstanding(outstanding, pageable);
+        return new ResponseEntity<>(baseResponse, HttpStatus.valueOf(baseResponse.getCode()));
+    }
+
     @Operation(summary = "Lấy sản phẩm theo danh mục sản phẩm")
     @GetMapping("/get/by/category-product-id/{categoryId}")
     public ResponseEntity<BaseResponse<List<ProductDTO>>>getProductByCategoryProductId(@PathVariable("categoryId") Long categoryId){

@@ -43,7 +43,7 @@ public class UserDTO {
     private String email;
 
     @NotBlank(message = "Số điện thoại không được để trống")
-    @Pattern(regexp = "^08[0-9]{8,9}$", message = "Số điện thoại phải đúng định dạng việt nam bắt đầu từ 2 số 08 và có độ dài từ 10-11 số")
+    @Pattern(regexp = "^(08|\\+84)[0-9]{8,9}$", message = "Số điện thoại phải đúng định dạng việt nam bắt đầu từ 2 số 08 và có độ dài từ 10-11 số")
     private String phoneNumber;
 
     private String userImage;

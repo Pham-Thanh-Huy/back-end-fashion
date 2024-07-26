@@ -10,11 +10,12 @@ public class Constant {
     public static final String VALIDATION_FAILED_MESSAGE = "Xác thực không thành công";
 
     // Constant với sản phẩm
-    public static final String EMPTY_ALL_PRODUCT = "Không tồn tại sản phẩm nào";
+    public static final String EMPTY_ALL_PRODUCT = "Không tm thấy sản phẩm nào";
     public static final String EMPTY_PRODUCT_BY_ID = "Không tìm thấy sản phẩm với id là: ";
     public static final String DELETE_SUCCESS_PRODUCT_BY_ID = "Xoá thành công sản phẩm với id là: ";
     public static final String ERROR_TO_DELETE_PRODUCT= "Lỗi khi xoá sản phẩm ";
     public static final String ERROR_TO_GET_PRODUCT = "Lỗi khi lấy sản phẩm: ";
+    public static final String   EMPTY_ALL_PRODUCT_OUTSTANDING = "Không tìm thấy sản phẩm nổi bật nào";
     public static final String ERROR_TO_ADD_PRODUCT = "Lỗi khi thêm sản phẩm: ";
     public static final String ERROR_TO_UPDATE_PRODUCT = "Lỗi khi sửa sản phẩm: ";
     // theo danh mục trong khi select sản phẩm
