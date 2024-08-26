@@ -1,0 +1,19 @@
+ public void crawlerDVCBN() {
+        webDriver.get(Constant.DICH_VU_CONG_BAC_NINH_URL);
+        WebDriverWait webDriverWait = new WebDriverWait(webDriver, Duration.ofSeconds(30));
+
+
+        for (int i = 1; i < 9999; i++) {
+            try {
+                // Xác định ấn vào nút trang sau nếu không phải là trang đầu tiên
+                if (i != 1) {
+                    WebElement elementClickPagination = webDriverWait.until(ExpectedConditions.elementToBeClickable(
+                            By.xpath("//div[@class='pagination-page-button form-group row']//a[contains(text(),'Sau')]")
+                    ));
+                    elementClickPagination.click();
+
+                }
+            } catch (Exception e) {
+                log.error("Lỗi trong quá trình click sang trang:", e);
+                continue;
+            }
