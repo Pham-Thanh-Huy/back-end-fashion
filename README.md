@@ -1,64 +1,67 @@
- // Vòng lặp con xử lý các phần tử trong trang hiện tại
-            int index = 1;
-            for (int j = 1; j <= 10; j++) {
-                try {
-                    dvcbnOddOrEven(webDriverWait, true, j);
-                } catch (Exception e) {
-                    log.error("Loi trong qua trinh crawler: " + e.getMessage());
-                }
-                try {
-                    dvcbnOddOrEven(webDriverWait, false, j);
-                } catch (Exception e) {
-                    log.error("Loi trong qua trinh crawler: " + e.getMessage());
-                }
+```package com.viettel.vtcc.knowledgeservice.config;
 
-            }
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.CorsFilter;
 
+@Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-        }
+    private static final String[] AUTH_WHITELIST = {
+            "/swagger-resources/**",
+            "/swagger-ui.html",
+            "/v2/api-docs",
+            "/webjars/**"
+    };
 
+    private final CorsFilter corsFilter;
 
+    public SecurityConfig(CorsFilter corsFilter) {
+        this.corsFilter = corsFilter;
     }
 
 
-    public void dvcbnOddOrEven(WebDriverWait webDriverWait, Boolean odd, int index) {
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring()
+                .antMatchers(HttpMethod.OPTIONS, "/**")
+                .antMatchers("/i18n/**")
+                .antMatchers("/assets/**")
+                .antMatchers("/swagger-ui/index.html")
+                .antMatchers("/modules/**")
+                .antMatchers(AUTH_WHITELIST);
+    }
 
-        String xpath;
-        if (odd) {
-            xpath = String.format("//tr[@class='odd'][%d]/td[@class='text-center']//button[@class='btn btn-info']", index);
-        } else {
-            xpath = String.format("//tr[@class='even'][%d]/td[@class='text-center']//button[@class='btn btn-info']", index);
-        }
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling()
+                .and()
+                .csrf()
+                .disable()
+                .headers()
+                .frameOptions()
+                .disable()
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests()
+                .antMatchers("/api/chatbot/**").permitAll()
+                .antMatchers("/api/target/**").permitAll()
+                .antMatchers("/api/target-dti/**").permitAll()
+                .antMatchers("/swagger-ui/*").permitAll()
+                .anyRequest().authenticated();
+    }
+}
 
-
-        // Xử lý nút click
-        WebElement elementClick = webDriverWait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath(xpath)
-        ));
-        elementClick.click();
-
-
-        List<IdDichVucCongBacNinh> idDichVucCongBacNinhList = idDichVucCongBacNinhRepository.findAll();
-
-        // check xem neu da ton tai id chua neu ton tai r bo qua
-
-        // Tiếp tục lấy ra phần tử thông tin
-
-        WebElement webElementParent = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//table[@class='table table-hover']/tbody")
-        ));
-
-
-        //-------------lấy mã thủ tục
-        WebElement elementMaThuTucValue = webElementParent.findElement(By.xpath(".//tr[1]/td"));
-        //xử lý mã thủ tục bỏ chữ xem chi tiết đi
-        String elementMaThuTucText = elementMaThuTucValue.getText().replaceAll("Xem chi tiết", "").trim();
-        String stringBuilderMaThuTuc = Constant.MA_THU_TUC + elementMaThuTucText;
-        Boolean checkExistsMaThuTuc = false;
-        // kiem tra xem ma thu tuc da ton tai
-        for (IdDichVucCongBacNinh idDichVucCongBacNinh : idDichVucCongBacNinhList) {
-            if (idDichVucCongBacNinh.getMaThuTuc().equals(elementMaThuTucText)) {
-                checkExistsMaThuTuc = true;
-                break;
-            }
-        }
