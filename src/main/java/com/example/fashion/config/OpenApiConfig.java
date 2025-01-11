@@ -19,8 +19,10 @@ public class OpenApiConfig   {
     public OpenAPI  customOpenApi(){
         return new OpenAPI()
                 .info(new Info().title("Quản lý api trong spring").description("API về fashion")
-                        .contact(new Contact().name("huypham").url("https://github.com/Pham-Thanh-Huy").email("huypham3062k3@gmail.com"))
-                        .license(new License().name("cửa hàng bán quần áo fashion").url("http://localhost:3000")).version("1.0.0"));
+                        .contact(new Contact().name("huypham").url("https://github.com/Pham-Thanh-Huy")
+                                .email("huypham3062k3@gmail.com"))
+                        .license(new License().name("cửa hàng bán quần áo fashion").url("http://localhost:3000"))
+                        .version("1.0.0"));
 
     }
 

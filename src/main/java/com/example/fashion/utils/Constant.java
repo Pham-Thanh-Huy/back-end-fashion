@@ -1,5 +1,7 @@
 package com.example.fashion.utils;
 
+import java.util.List;
+
 public class Constant {
 
     //Constant các trạng thái của message
@@ -174,5 +176,9 @@ public class Constant {
     public static final int SUCCESS_CODE = 200;
     public static final int BAD_REQUEST_CODE = 400;
     public static final int NOT_FOUND_CODE = 404;
+
+
+    public static final List<String> LIST_URL_ACCESS_CORS = List.of("http://localhost:3000", "http://localhost:3001", "http://localhost:5173", "http://127.0.0.1:5173");
+    public static final List<String> LIST_METHOD_HTTP_REQUEST = List.of("GET", "POST", "PUT", "DELETE", "OPTIONS");
 }
 

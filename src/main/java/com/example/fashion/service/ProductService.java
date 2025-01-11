@@ -67,7 +67,7 @@ public class ProductService {
         BaseResponse<Page<ProductDTO>> baseResponse = new BaseResponse<>();
         try {
             Page<Product> productPage = productRepository.findAll(pageable);
-            if (productPage.isEmpty() || productPage == null) {
+            if (productPage.isEmpty()) {
                 baseResponse.setMessage(Constant.EMPTY_ALL_PRODUCT);
                 baseResponse.setCode(Constant.NOT_FOUND_CODE);
                 return baseResponse;
@@ -447,7 +447,7 @@ public class ProductService {
 
             // check xem  màu + size + số lượng sản phẩm đã tồn tại chưa nếu tồn tại rồi thì không cho thêm;
             for (Inventory inventory : product.getInventoryList()) {
-                if (inventory.getProductColor().getProductColorId() == productColorId && inventory.getProductSize().getProductSizeId() == productSizeId) {
+                if (inventory.getProductColor().getProductColorId().equals(productColorId) && inventory.getProductSize().getProductSizeId().equals(productSizeId)) {
                     baseResponse.setMessage(Constant.PRODUCT_COLOR_ID_AND_PRODUCT_SIZE_ID_EXISTS_QUANTITY_IN_PRODUCT);
                     baseResponse.setCode(Constant.BAD_REQUEST_CODE);
                     return baseResponse;
@@ -494,7 +494,7 @@ public class ProductService {
 
 
     public BaseResponse<ProductDTO> updateProduct(Long productId, ProductDTO productDTO, Long categoryProductId, Long userId) {
-        BaseResponse baseResponse = new BaseResponse();
+        BaseResponse<ProductDTO> baseResponse = new BaseResponse<>();
         try {
             Product product = productRepository.getProductById(productId);
             CategoryProduct categoryProduct = categoryProductRepository.getCategoryProductById(categoryProductId);
@@ -540,7 +540,7 @@ public class ProductService {
             for (ImageProduct imageProduct : imageProductExits) {
                 for (ImageDTO imageDTO : imageDTOList) {
                     if (imageProduct.getImageProduct().equals(imageDTO.getImageProduct())) {
-                        if ((imageDTO.getData().length > 0) || imageDTO.getData() != null) {
+                        if (imageDTO.getData() != null && imageDTO.getData().length > 0) {
                             byte[] newImage = Base64.getDecoder().decode(Base64.getEncoder().encode(imageDTO.getData()));
                             InputStream inputStream = new ByteArrayInputStream(newImage);
                             String objectName = imageDTO.getImageProduct();
@@ -578,7 +578,6 @@ public class ProductService {
         } catch (Exception e) {
             baseResponse.setMessage(Constant.ERROR_TO_UPDATE_PRODUCT + e.getMessage());
             baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
-            e.printStackTrace();
         }
 
         return baseResponse;
@@ -633,7 +632,7 @@ public class ProductService {
 
                 // tiếp tục kiểm tra
                 for (Inventory inventory : inventoryList) {
-                    if (inventory.getProductSize().getProductSizeId() == productSizeId && inventory.getProductColor().getProductColorId() == productColorId) {
+                    if (inventory.getProductSize().getProductSizeId().equals(productSizeId) && inventory.getProductColor().getProductColorId().equals(productColorId)) {
                         inventory.setQuantity(quantity);
                     }
                 }
@@ -658,7 +657,7 @@ public class ProductService {
     }
 
     public BaseResponse<ProductDTO> deleteById(Long productId) {
-        BaseResponse baseResponse = new BaseResponse();
+        BaseResponse<ProductDTO> baseResponse = new BaseResponse<>();
         try {
             Product product = productRepository.getProductById(productId);
             if (product == null) {
@@ -683,7 +682,6 @@ public class ProductService {
         } catch (Exception e) {
             baseResponse.setMessage(Constant.ERROR_TO_DELETE_PRODUCT + e.getMessage());
             baseResponse.setCode(Constant.INTERNAL_SERVER_ERROR_CODE);
-            e.printStackTrace();
         }
         return baseResponse;
     }

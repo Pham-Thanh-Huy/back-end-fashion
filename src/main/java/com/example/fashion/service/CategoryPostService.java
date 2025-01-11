@@ -28,7 +28,7 @@ public class CategoryPostService {
 
     private final UserRepository userRepository;
 
-    public BaseResponse<List<CategoryPostDTO>> getAllCategoryPost() {
+    public BaseResponse<List<CategoryPostDTO>> getAllCategoryPost()  {
         BaseResponse<List<CategoryPostDTO>> baseResponse = new BaseResponse<>();
         List<CategoryPostDTO> categoryPostDTOList = new ArrayList<>();
         try {
