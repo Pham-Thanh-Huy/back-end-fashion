@@ -52,6 +52,8 @@ public class JWTUtils {
             }
         }
 
+        claims.put("userId", user.getUserId());
+
        return  createToken(claims, username);
     }
 
