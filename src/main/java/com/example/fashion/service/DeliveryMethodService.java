@@ -19,9 +19,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DeliveryMethodService {
 
-    private DeliveryMethodRepository deliveryMethodRepository;
-    private ConvertRelationship convertRelationship;
-    private UserRepository userRepository;
+    private final DeliveryMethodRepository deliveryMethodRepository;
+    private final ConvertRelationship convertRelationship;
+    private final UserRepository userRepository;
 
     public BaseResponse<List<DeliveryMethodDTO>> getAllDeliveryMethod(){
         BaseResponse<List<DeliveryMethodDTO>> baseResponse = new BaseResponse<>();
