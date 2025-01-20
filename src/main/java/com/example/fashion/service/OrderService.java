@@ -411,12 +411,13 @@ public class OrderService {
 
             }
 
-            orderRepository.save(order);
+           Order saveOrder =  orderRepository.save(order);
             orderDetailRepository.saveAll(orderDetailList);
             inventoryRepository.saveAll(inventoryListUpdate);
 
             // tiếp tục convert vài dto để trả ra cho người dùng xem
             UserDTO userDTO = convertRelationship.convertToUserDTO(user);
+            orderDTO.setOrderId(saveOrder.getOrderId());
             orderDTO.setUser(userDTO);
             orderDTO.setDeliveryMethod(convertRelationship.convertToDeliveryMethodDTO(deliveryMethod));
             orderDTO.setPaymentMethod(convertRelationship.convertToPaymentMethodDTO(paymentMethod));
